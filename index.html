@@ -102,11 +102,16 @@
             text-align: center;
             border: 2px solid transparent;
             transition: all 0.3s;
+            cursor: pointer;
         }
 
         .info-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .info-card:active {
+            transform: translateY(-3px) scale(0.98);
         }
 
         .info-card.baixo { border-color: #10B981; }
@@ -406,14 +411,6 @@
         .modal-badge.alto {
             background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
         }
-
-        .info-card {
-            cursor: pointer;
-        }
-
-        .info-card:active {
-            transform: translateY(-3px) scale(0.98);
-        }
     </style>
 </head>
 <body>
@@ -485,10 +482,7 @@
     </div>
 
     <script>
-        // ============================================
         // DADOS DE ALTO RISCO (415 ATIVIDADES)
-        // Formato: CNAE|Atividade
-        // ============================================
         const DADOS_ALTO_RISCO = `1012-1/01|Abate de aves
 1012-1/02|Abate de pequenos animais
 5590-6/01|Albergues, exceto assistenciais
@@ -496,8 +490,8 @@
 8630-5/02|Atividade médica ambulatorial com recursos para realização de exames complementares
 8630-5/01|Atividade médica ambulatorial com recursos para realização de procedimentos cirúrgicos
 8690-9/03|Atividades de acupuntura
-0990-4/02|Atividades de apoio à extração de minerais metálicos Não-ferrosos
-0990-4/03|Atividades de apoio à extração de minerais Não-metálicos
+0990-4/02|Atividades de apoio à extração de minerais metálicos não-ferrosos
+0990-4/03|Atividades de apoio à extração de minerais não-metálicos
 0990-4/01|Atividades de apoio à extração de minério de ferro
 0910-6/00|Atividades de apoio à extração de petróleo e gás natural
 0311-6/04|Atividades de apoio à pesca em água salgada
@@ -505,7 +499,7 @@
 8730-1/99|Atividades de assistência social prestadas em residências coletivas e particulares não especificadas anteriormente
 8630-5/99|Atividades de atenção ambulatorial não especificadas anteriormente
 8610-1/02|Atividades de atendimento em pronto-socorro e unidades hospitalares para atendimento a urgências
-8610-1/01|Atividades de atendimento hospitalar, exceto prontosocorro e unidades para atendimento a urgências
+8610-1/01|Atividades de atendimento hospitalar, exceto pronto-socorro e unidades para atendimento a urgências
 8690-9/02|Atividades de bancos de leite humano
 3511-5/02|Atividades de coordenação e controle da operação da geração e transmissão de energia elétrica
 8650-0/01|Atividades de enfermagem
@@ -567,7 +561,7 @@
 4744-0/05|Comércio varejista de materiais de construção não especificados anteriormente
 4711-3/01|Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - hipermercados
 4712-1/00|Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - minimercados, mercearias e armazéns
-4711-3/02|Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios supermercados
+4711-3/02|Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - supermercados
 4789-0/99|Comércio varejista de outros produtos não especificados anteriormente
 4771-7/03|Comércio varejista de produtos farmacêuticos homeopáticos
 4771-7/02|Comércio varejista de produtos farmacêuticos, com manipulação de fórmulas
@@ -618,9 +612,9 @@
 0724-3/01|Extração de minério de metais preciosos
 0729-4/03|Extração de minério de níquel
 0729-4/02|Extração de minério de tungstênio
-0729-4/04|Extração de minérios de cobre, chumbo, zinco e outros minerais metálicos Não-ferrosos Não especificados anteriormente
+0729-4/04|Extração de minérios de cobre, chumbo, zinco e outros minerais metálicos não-ferrosos não especificados anteriormente
 0729-4/01|Extração de minérios de nióbio e titânio
-0899-1/99|Extração de outros minerais Não-metálicos Não especificados anteriormente
+0899-1/99|Extração de outros minerais não-metálicos não especificados anteriormente
 0600-0/01|Extração de petróleo e gás natural
 0899-1/02|Extração de quartzo
 0810-0/08|Extração de saibro e beneficiamento associado
@@ -635,12 +629,12 @@
 2091-6/00|Fabricação de adesivos e selantes
 2093-2/00|Fabricação de aditivos de uso industrial
 2013-4/01|Fabricação de adubos e fertilizantes organo-minerais
-2013-4/02|Fabricação de adubos e fertilizantes, exceto organo_x0002_minerais
+2013-4/02|Fabricação de adubos e fertilizantes, exceto organo-minerais
 3041-5/00|Fabricação de aeronaves
 1931-4/00|Fabricação de álcool
 2640-0/00|Fabricação de aparelhos de recepção, reprodução, gravação e amplificação de áudio e vídeo
 2824-1/01|Fabricação de aparelhos e equipamentos de ar condicionado
-2824-1/02|Fabricação de aparelhos e equipamentos de ar condicionado para uso Não-industrial
+2824-1/02|Fabricação de aparelhos e equipamentos de ar condicionado para uso não-industrial
 2651-5/00|Fabricação de aparelhos e equipamentos de medida, teste e controle
 2731-7/00|Fabricação de aparelhos e equipamentos para distribuição e controle de energia elétrica
 2759-7/01|Fabricação de aparelhos elétricos de uso pessoal, peças e acessórios
@@ -653,7 +647,7 @@
 2910-7/01|Fabricação de automóveis, camionetas e utilitários
 2949-2/01|Fabricação de bancos e estofados para veículos automotores
 2722-8/01|Fabricação de baterias e acumuladores para veículos automotores
-3092-0/00|Fabricação de bicicletas e triciclos Não-motorizados, peças e acessórios
+3092-0/00|Fabricação de bicicletas e triciclos não-motorizados, peças e acessórios
 1932-2/00|Fabricação de biocombustíveis, exceto álcool
 1092-9/00|Fabricação de biscoitos e bolachas
 2930-1/01|Fabricação de cabines, carrocerias e reboques para caminhões
@@ -672,7 +666,7 @@
 2011-8/00|Fabricação de cloro e álcalis
 2610-8/00|Fabricação de componentes eletrônicos
 2814-3/01|Fabricação de compressores para uso industrial, peças e acessórios
-2814-3/02|Fabricação de compressores para uso Não-industrial, peças e acessórios
+2814-3/02|Fabricação de compressores para uso não-industrial, peças e acessórios
 1020-1/02|Fabricação de conservas de peixes, crustáceos e moluscos
 2652-3/00|Fabricação de cronômetros e relógios
 2051-7/00|Fabricação de defensivos agrícolas
@@ -682,7 +676,7 @@
 2550-1/01|Fabricação de equipamento bélico pesado, exceto veículos militares de combate
 2621-3/00|Fabricação de equipamentos de informática
 2815-1/02|Fabricação de equipamentos de transmissão para fins industriais, exceto rolamentos
-3099-7/00|Fabricação de equipamentos de transporte Não especificados anteriormente
+3099-7/00|Fabricação de equipamentos de transporte não especificados anteriormente
 2670-1/01|Fabricação de equipamentos e instrumentos ópticos, peças e acessórios
 2812-7/00|Fabricação de equipamentos hidráulicos e pneumáticos, peças e acessórios, exceto válvulas
 2832-1/00|Fabricação de equipamentos para irrigação agrícola, peças e acessórios
@@ -693,7 +687,7 @@
 1220-4/03|Fabricação de filtros para cigarros
 2733-3/00|Fabricação de fios, cabos e condutores elétricos isolados
 2751-1/00|Fabricação de fogões, refrigeradores e máquinas de lavar e secar para uso doméstico, peças e acessórios
-2821-6/01|Fabricação de fornos industriais, aparelhos e equipamentos Não-elétricos para instalações térmicas, peças e acessórios
+2821-6/01|Fabricação de fornos industriais, aparelhos e equipamentos não-elétricos para instalações térmicas, peças e acessórios
 2092-4/03|Fabricação de fósforos de segurança
 2014-2/00|Fabricação de gases industriais
 2710-4/01|Fabricação de geradores de corrente contínua e alternada, peças e acessórios
@@ -705,7 +699,7 @@
 3031-8/00|Fabricação de locomotivas, vagões e outros materiais rodantes
 2740-6/02|Fabricação de luminárias e outros equipamentos de iluminação
 1621-8/00|Fabricação de madeira laminada e de chapas de madeira compensada, prensada e aglomerada
-2829-1/01|Fabricação de máquinas de escrever, calcular e outros equipamentos Não-eletrônicos para escritório, peças e acessórios
+2829-1/01|Fabricação de máquinas de escrever, calcular e outros equipamentos não-eletrônicos para escritório, peças e acessórios
 2823-2/00|Fabricação de máquinas e aparelhos de refrigeração e ventilação para uso industrial e comercial, peças e acessórios
 2833-0/00|Fabricação de máquinas e equipamentos para a agricultura e pecuária, peças e acessórios, exceto para irrigação
 2866-6/00|Fabricação de máquinas e equipamentos para a indústria do plástico, peças e acessórios
@@ -716,7 +710,7 @@
 2864-0/00|Fabricação de máquinas e equipamentos para as indústrias do vestuário, do couro e de calçados, peças e acessórios
 2825-9/00|Fabricação de máquinas e equipamentos para saneamento básico e ambiental, peças e acessórios
 2854-2/00|Fabricação de máquinas e equipamentos para terraplenagem, pavimentação e construção, peças e acessórios, exceto tratores
-2869-1/00|Fabricação de máquinas e equipamentos para uso industrial específico Não especificados anteriormente, peças e acessórios
+2869-1/00|Fabricação de máquinas e equipamentos para uso industrial específico não especificados anteriormente, peças e acessórios
 2861-5/00|Fabricação de máquinas para a indústria metalúrgica, peças e acessórios, exceto máquinas-ferramenta
 2822-4/02|Fabricação de máquinas, equipamentos e aparelhos para transporte e elevação de cargas, peças e acessórios
 2822-4/01|Fabricação de máquinas, equipamentos e aparelhos para transporte e elevação de pessoas, peças e acessórios
@@ -736,16 +730,16 @@
 2513-6/00|Fabricação de obras de caldeiraria pesada
 1065-1/03|Fabricação de óleo de milho refinado
 1042-2/00|Fabricação de óleos vegetais refinados, exceto óleo de milho
-2829-1/99|Fabricação de outras máquinas e equipamentos de uso geral Não especificados anteriormente, peças e acessórios
+2829-1/99|Fabricação de outras máquinas e equipamentos de uso geral não especificados anteriormente, peças e acessórios
 2852-6/00|Fabricação de outras máquinas e equipamentos para uso na extração mineral, peças e acessórios, exceto na extração de petróleo
-2949-2/99|Fabricação de outras peças e acessórios para veículos automotores Não especificadas anteriormente
-2759-7/99|Fabricação de outros aparelhos eletrodomésticos Não especificados anteriormente, peças e acessórios
-2790-2/99|Fabricação de outros equipamentos e aparelhos elétricos Não especificados anteriormente
-2399-1/99|Fabricação de outros produtos de minerais Não-metálicos Não especificados anteriormente
+2949-2/99|Fabricação de outras peças e acessórios para veículos automotores não especificadas anteriormente
+2759-7/99|Fabricação de outros aparelhos eletrodomésticos não especificados anteriormente, peças e acessórios
+2790-2/99|Fabricação de outros equipamentos e aparelhos elétricos não especificados anteriormente
+2399-1/99|Fabricação de outros produtos de minerais não-metálicos não especificados anteriormente
 1922-5/99|Fabricação de outros produtos derivados do petróleo, exceto produtos do refino
 1220-4/99|Fabricação de outros produtos do fumo, exceto cigarros, cigarrilhas e charutos
-2019-3/99|Fabricação de outros produtos químicos inorgânicos Não especificados anteriormente
-2099-1/99|Fabricação de outros produtos químicos Não especificados anteriormente
+2019-3/99|Fabricação de outros produtos químicos inorgânicos não especificados anteriormente
+2099-1/99|Fabricação de outros produtos químicos não especificados anteriormente
 3091-1/02|Fabricação de peças e acessórios para motocicletas
 2944-1/00|Fabricação de peças e acessórios para o sistema de direção e suspensão de veículos automotores
 2943-3/00|Fabricação de peças e acessórios para o sistema de freios de veículos automotores
@@ -763,7 +757,7 @@
 1921-7/00|Fabricação de produtos do refino de petróleo
 2110-6/00|Fabricação de produtos farmoquímicos
 2021-5/00|Fabricação de produtos petroquímicos básicos
-2029-1/00|Fabricação de produtos químicos orgânicos Não especificados anteriormente
+2029-1/00|Fabricação de produtos químicos orgânicos não especificados anteriormente
 1122-4/01|Fabricação de refrigerantes
 2032-1/00|Fabricação de resinas termofixas
 2031-2/00|Fabricação de resinas termoplásticas
@@ -784,7 +778,7 @@
 1011-2/03|Frigorífico - abate de ovinos e caprinos
 1012-1/03|Frigorífico - abate de suínos
 2451-2/00|Fundição de ferro e aço
-2452-1/00|Fundição de metais Não-ferrosos e suas ligas
+2452-1/00|Fundição de metais não-ferrosos e suas ligas
 3511-5/01|Geração de energia elétrica
 3701-1/00|Gestão de redes de esgoto
 5231-1/03|Gestão de terminais aquaviários
@@ -804,7 +798,7 @@
 3315-5/00|Manutenção e reparação de veículos ferroviários
 1011-2/05|Matadouro - abate de reses sob contrato, exceto abate de suínos
 1012-1/04|Matadouro - abate de suínos sob contrato
-2449-1/99|Metalurgia de outros metais Não-ferrosos e suas ligas Não especificados anteriormente
+2449-1/99|Metalurgia de outros metais não-ferrosos e suas ligas não especificados anteriormente
 2443-1/00|Metalurgia do cobre
 2442-3/00|Metalurgia dos metais preciosos
 4329-1/04|Montagem e instalação de sistemas e equipamentos de iluminação e sinalização em vias públicas, portos e aeroportos
@@ -817,7 +811,7 @@
 4299-5/99|Outras obras de engenharia civil não especificadas anteriormente
 4329-1/99|Outras obras de instalações em construções não especificadas anteriormente
 5590-6/99|Outros alojamentos não especificados anteriormente
-4929-9/99|Outros transportes rodoviários de passageiros não especificado anteriormente
+4929-9/99|Outros transportes rodoviários de passageiros não especificados anteriormente
 4721-1/02|Padaria e confeitaria com predominância de revenda
 0710-3/02|Pelotização, sinterização e outros beneficiamentos de minério de ferro
 5590-6/03|Pensões (alojamento)
@@ -832,7 +826,7 @@
 2411-3/00|Produção de ferro-gusa
 2412-1/00|Produção de ferroligas
 2531-4/01|Produção de forjados de aço
-2531-4/02|Produção de forjados de metais Não-ferrosos e suas ligas
+2531-4/02|Produção de forjados de metais não-ferrosos e suas ligas
 3520-4/01|Produção de gás; processamento de gás natural
 2441-5/02|Produção de laminados de alumínio
 2449-1/02|Produção de laminados de zinco
@@ -848,7 +842,7 @@
 3530-1/00|Produção e distribuição de vapor, água quente e ar condicionado
 2722-8/02|Recondicionamento de baterias e acumuladores para veículos automotores
 2950-6/00|Recondicionamento e recuperação de motores para veículos automotores
-3839-4/99|Recuperação de materiais Não especificados anteriormente
+3839-4/99|Recuperação de materiais não especificados anteriormente
 0892-4/03|Refino e outros tratamentos do sal
 2212-9/00|Reforma de pneumáticos usados
 1922-5/02|Rerrefino de óleos lubrificantes
@@ -900,15 +894,12 @@
 4930-2/02|Transporte rodoviário de carga, exceto produtos perigosos e mudanças, intermunicipal, interestadual e internacional
 4930-2/01|Transporte rodoviário de carga, exceto produtos perigosos e mudanças, municipal
 4930-2/03|Transporte rodoviário de produtos perigosos
-3821-1/00|Tratamento e disposição de resíduos Não-perigosos
+3821-1/00|Tratamento e disposição de resíduos não-perigosos
 3822-0/00|Tratamento e disposição de resíduos perigosos
 4329-1/05|Tratamentos térmicos, acústicos ou de vibração
-3839-4/01|Usinas de compostagem`.split('\n');
-        
-        // ============================================
+3839-4/01|Usinas de compostagem`;
+
         // DADOS DE MÉDIO RISCO (394 ATIVIDADES)
-        // Formato: CNAE|Atividade
-        // ============================================
         const DADOS_MEDIO_RISCO = `5231-1/01|Administração da infra-estrutura portuária
 8550-3/01|Administração de caixas escolares
 5250-8/03|Agenciamento de cargas, exceto para o transporte marítimo
@@ -919,8 +910,7 @@
 7731-4/00|Aluguel de máquinas e equipamentos agrícolas sem operador
 7732-2/01|Aluguel de máquinas e equipamentos para construção sem operador, exceto andaimes
 7739-0/01|Aluguel de máquinas e equipamentos para extração de minérios e petróleo, sem operador
-7739-0/99|Aluguel de outras máquinas e equipamentos comerciais e industriais não especificados anteriormente,
-sem operador
+7739-0/99|Aluguel de outras máquinas e equipamentos comerciais e industriais não especificados anteriormente, sem operador
 7739-0/03|Aluguel de palcos, coberturas e outras estruturas de uso temporário, exceto andaimes
 2391-5/02|Aparelhamento de pedras para construção, exceto associado à extração
 2391-5/03|Aparelhamento de placas e execução de trabalhos em mármore, granito, ardósia e outras pedras
@@ -929,16 +919,14 @@ sem operador
 5211-7/01|Armazéns gerais - emissão de warrant
 8630-5/03|Atividade médica ambulatorial restrita a consultas
 8630-5/04|Atividade odontológica
-5240-1/99|Atividades auxiliares dos transportes aéreos, exceto operação dos aeroportos e campos de
-aterrissagem
+5240-1/99|Atividades auxiliares dos transportes aéreos, exceto operação dos aeroportos e campos de aterrissagem
 5239-7/99|Atividades auxiliares dos transportes aquaviários não especificadas anteriormente
 0161-0/99|Atividades de apoio à agricultura não especificadas anteriormente
 0322-1/07|Atividades de apoio à aqüicultura em água doce
 0321-3/05|Atividades de apoio à aqüicultura em água salgada e salobra
 0162-8/99|Atividades de apoio à pecuária não especificadas anteriormente
 0312-4/04|Atividades de apoio à pesca em água doce
-8720-4/99|Atividades de assistência psicossocial e à saúde a portadores de distúrbios psíquicos, deficiência
-mental e dependência química não especificadas anteriormente
+8720-4/99|Atividades de assistência psicossocial e à saúde a portadores de distúrbios psíquicos, deficiência mental e dependência química não especificadas anteriormente
 9430-8/00|Atividades de associações de defesa de direitos sociais
 8720-4/01|Atividades de centros de assistência psicossocial
 9313-1/00|Atividades de condicionamento físico
@@ -986,8 +974,7 @@ mental e dependência química não especificadas anteriormente
 4634-6/01|Comércio atacadista de carnes bovinas e suínas e derivados
 4634-6/99|Comércio atacadista de carnes e derivados de outros animais
 4632-0/01|Comércio atacadista de cereais e leguminosas beneficiados
-4632-0/03|Comércio atacadista de cereais e leguminosas beneficiados, farinhas, amidos e féculas, com atividade
-de fracionamento e acondicionamento associada
+4632-0/03|Comércio atacadista de cereais e leguminosas beneficiados, farinhas, amidos e féculas, com atividade de fracionamento e acondicionamento associada
 4635-4/02|Comércio atacadista de cerveja, chope e refrigerante
 4637-1/07|Comércio atacadista de chocolates, confeitos, balas, bombons e semelhantes
 4636-2/02|Comércio atacadista de cigarros, cigarrilhas e charutos
@@ -1006,18 +993,15 @@ de fracionamento e acondicionamento associada
 4644-3/02|Comércio atacadista de medicamentos e drogas de uso veterinário
 4692-3/00|Comércio atacadista de mercadorias em geral, com predominância de insumos agropecuários
 4691-5/00|Comércio atacadista de mercadorias em geral, com predominância de produtos alimentícios
-4693-1/00|Comércio atacadista de mercadorias em geral, sem predominância de alimentos ou de insumos
-agropecuários
+4693-1/00|Comércio atacadista de mercadorias em geral, sem predominância de alimentos ou de insumos agropecuários
 4637-1/03|Comércio atacadista de óleos e gorduras
 4637-1/04|Comércio atacadista de pães, bolos, biscoitos e similares
 4634-6/03|Comércio atacadista de pescados e frutos do mar
 4639-7/01|Comércio atacadista de produtos alimentícios em geral
-4639-7/02|Comércio atacadista de produtos alimentícios em geral, com atividade de fracionamento e
-acondicionamento associada
+4639-7/02|Comércio atacadista de produtos alimentícios em geral, com atividade de fracionamento e acondicionamento associada
 4689-3/01|Comércio atacadista de produtos da extração mineral, exceto combustíveis
 4646-0/02|Comércio atacadista de produtos de higiene pessoal
-4649-4/09|Comércio atacadista de produtos de higiene, limpeza e conservação domiciliar, com atividade de
-fracionamento e acondicionamento associada
+4649-4/09|Comércio atacadista de produtos de higiene, limpeza e conservação domiciliar, com atividade de fracionamento e acondicionamento associada
 4685-1/00|Comércio atacadista de produtos siderúrgicos e metalúrgicos, exceto para construção
 4622-2/00|Comércio atacadista de soja
 4637-1/06|Comércio atacadista de sorvetes
@@ -1042,13 +1026,11 @@ fracionamento e acondicionamento associada
 4724-5/00|Comércio varejista de hortifrutigranjeiros
 4721-1/03|Comércio varejista de laticínios e frios
 4742-3/00|Comércio varejista de material elétrico
-4729-6/99|Comércio varejista de produtos alimentícios em geral ou especializado em produtos alimentícios não
-especificados anteriormente
+4729-6/99|Comércio varejista de produtos alimentícios em geral ou especializado em produtos alimentícios não especificados anteriormente
 4789-0/05|Comércio varejista de produtos saneantes domissanitários
 5250-8/01|Comissaria de despachos
 4212-0/00|Construção de obras de arte especiais
-4222-7/01|Construção de redes de abastecimento de água, coleta de esgoto e construções correlatas, exceto
-obras de irrigação
+4222-7/01|Construção de redes de abastecimento de água, coleta de esgoto e construções correlatas, exceto obras de irrigação
 4223-5/00|Construção de redes de transportes por dutos, exceto para água e esgoto
 0159-8/02|Criação de animais de estimação
 0152-1/03|Criação de asininos e muares
@@ -1096,10 +1078,8 @@ obras de irrigação
 1096-1/00|Fabricação de alimentos e pratos prontos
 1066-0/00|Fabricação de alimentos para animais
 1065-1/01|Fabricação de amidos e féculas de vegetais
-3250-7/03|Fabricação de aparelhos e utensílios para correção de defeitos físicos e aparelhos ortopédicos em
-geral sob encomenda
-3250-7/04|Fabricação de aparelhos e utensílios para correção de defeitos físicos e aparelhos ortopédicos em
-geral, exceto sob encomenda
+3250-7/03|Fabricação de aparelhos e utensílios para correção de defeitos físicos e aparelhos ortopédicos em geral sob encomenda
+3250-7/04|Fabricação de aparelhos e utensílios para correção de defeitos físicos e aparelhos ortopédicos em geral, exceto sob encomenda
 2219-6/00|Fabricação de artefatos de borracha não especificados anteriormente
 2342-7/02|Fabricação de artefatos de cerâmica e barro cozido para uso na construção, exceto azulejos e pisos
 2330-3/02|Fabricação de artefatos de cimento para uso na construção
@@ -1153,8 +1133,7 @@ geral, exceto sob encomenda
 1099-6/04|Fabricação de gelo comum
 3299-0/01|Fabricação de guarda-chuvas e similares
 3220-5/00|Fabricação de instrumentos musicais, peças e acessórios
-3250-7/01|Fabricação de instrumentos não-eletrônicos e utensílios para uso médico, cirúrgico, odontológico e de
-laboratório
+3250-7/01|Fabricação de instrumentos não-eletrônicos e utensílios para uso médico, cirúrgico, odontológico e de laboratório
 2221-8/00|Fabricação de laminados planos e tubulares de material plástico
 1052-0/00|Fabricação de laticínios
 3299-0/03|Fabricação de letras, letreiros e placas de qualquer material, exceto luminosos
@@ -1174,8 +1153,7 @@ laboratório
 1041-4/00|Fabricação de óleos vegetais em bruto, exceto óleo de milho
 1111-9/02|Fabricação de outras aguardentes e bebidas destiladas
 1122-4/99|Fabricação de outras bebidas não-alcoólicas não especificadas anteriormente
-2330-3/99|Fabricação de outros artefatos e produtos de concreto, cimento, fibrocimento, gesso e materiais
-semelhantes
+2330-3/99|Fabricação de outros artefatos e produtos de concreto, cimento, fibrocimento, gesso e materiais semelhantes
 1622-6/99|Fabricação de outros artigos de carpintaria para construção
 3240-0/99|Fabricação de outros brinquedos e jogos recreativos não especificados anteriormente
 1099-6/99|Fabricação de outros produtos alimentícios não especificados anteriormente
@@ -1231,29 +1209,22 @@ semelhantes
 3314-7/05|Manutenção e reparação de equipamentos de transmissão para fins industriais
 3319-8/00|Manutenção e reparação de equipamentos e produtos não especificados anteriormente
 3314-7/02|Manutenção e reparação de equipamentos hidráulicos e pneumáticos, exceto válvulas
-3314-7/07|Manutenção e reparação de máquinas e aparelhos de refrigeração e ventilação para uso industrial e
-comercial
-3314-7/21|Manutenção e reparação de máquinas e aparelhos para a indústria de celulose, papel e papelão e
-artefatos
+3314-7/07|Manutenção e reparação de máquinas e aparelhos de refrigeração e ventilação para uso industrial e comercial
+3314-7/21|Manutenção e reparação de máquinas e aparelhos para a indústria de celulose, papel e papelão e artefatos
 3314-7/22|Manutenção e reparação de máquinas e aparelhos para a indústria do plástico
-3314-7/17|Manutenção e reparação de máquinas e equipamentos de terraplenagem, pavimentação e construção,
-exceto tratores
-3314-7/20|Manutenção e reparação de máquinas e equipamentos para a indústria têxtil, do vestuário, do couro e
-calçados
+3314-7/17|Manutenção e reparação de máquinas e equipamentos de terraplenagem, pavimentação e construção, exceto tratores
+3314-7/20|Manutenção e reparação de máquinas e equipamentos para a indústria têxtil, do vestuário, do couro e calçados
 3314-7/14|Manutenção e reparação de máquinas e equipamentos para a prospecção e extração de petróleo
 3314-7/11|Manutenção e reparação de máquinas e equipamentos para agricultura e pecuária
 3314-7/19|Manutenção e reparação de máquinas e equipamentos para as indústrias de alimentos, bebidas e fumo
-3314-7/15|Manutenção e reparação de máquinas e equipamentos para uso na extração mineral, exceto na
-extração de petróleo
+3314-7/15|Manutenção e reparação de máquinas e equipamentos para uso na extração mineral, exceto na extração de petróleo
 3314-7/01|Manutenção e reparação de máquinas motrizes não-elétricas
 3314-7/18|Manutenção e reparação de máquinas para a indústria metalúrgica, exceto máquinas-ferramenta
 3314-7/06|Manutenção e reparação de máquinas, aparelhos e equipamentos para instalações térmicas
 3313-9/99|Manutenção e reparação de máquinas, aparelhos e materiais elétricos não especificados anteriormente
-3314-7/08|Manutenção e reparação de máquinas, equipamentos e aparelhos para transporte e elevação de
-cargas
+3314-7/08|Manutenção e reparação de máquinas, equipamentos e aparelhos para transporte e elevação de cargas
 3314-7/13|Manutenção e reparação de máquinas-ferramenta
-3314-7/99|Manutenção e reparação de outras máquinas e equipamentos para usos industriais não especificados
-anteriormente
+3314-7/99|Manutenção e reparação de outras máquinas e equipamentos para usos industriais não especificados anteriormente
 3314-7/12|Manutenção e reparação de tratores agrícolas
 3314-7/16|Manutenção e reparação de tratores, exceto agrícolas
 3314-7/03|Manutenção e reparação de válvulas industriais
@@ -1310,13 +1281,11 @@ anteriormente
 8550-3/02|Serviços auxiliares à educação
 8111-7/00|Serviços combinados para apoio a edifícios, exceto condomínios prediais
 1822-9/99|Serviços de acabamentos gráficos, exceto encadernação e plastificação
-1822-9/00|Serviços de acabamentos gráficos, exceto encadernação e plastificação
 5620-1/02|Serviços de alimentação para eventos e recepções - bufê
 6110-8/03|Serviços de comunicação multimídia - SMC
 2599-3/01|Serviços de confecção de armações metálicas para a construção
 1822-9/01|Serviços de encadernação e plastificação
-4399-1/04|Serviços de operação e fornecimento de equipamentos para transporte e elevação de cargas e
-pessoas para uso em obras
+4399-1/04|Serviços de operação e fornecimento de equipamentos para transporte e elevação de cargas e pessoas para uso em obras
 8230-0/01|Serviços de organização de feiras, congressos, exposições e festas
 5239-7/01|Serviços de praticagem
 3250-7/06|Serviços de prótese dentária
@@ -1345,19 +1314,14 @@ pessoas para uso em obras
 5012-2/02|Transporte marítimo de longo curso - Passageiros
 5091-2/02|Transporte por navegação de travessia intermunicipal, interestadual e internacional
 5091-2/01|Transporte por navegação de travessia, municipal
-5021-1/02|Transporte por navegação interior de carga, intermunicipal, interestadual e internacional, exceto
-travessia
+5021-1/02|Transporte por navegação interior de carga, intermunicipal, interestadual e internacional, exceto travessia
 5021-1/01|Transporte por navegação interior de carga, municipal, exceto travessia
-5022-0/02|Transporte por navegação interior de passageiros em linhas regulares, intermunicipal, interestadual e
-internacional, exceto travessia
+5022-0/02|Transporte por navegação interior de passageiros em linhas regulares, intermunicipal, interestadual e internacional, exceto travessia
 5022-0/01|Transporte por navegação interior de passageiros em linhas regulares, municipal, exceto travessia
 4950-7/00|Trens turísticos, teleféricos e similares
-8621-6/01|UTI móvel`.split('\n');
+8621-6/01|UTI móvel`;
 
-        // ============================================
-        // DADOS DE BAIXO RISCO (526 ATIVIDADES)
-        // Formato: CNAE|Atividade
-        // ============================================
+        // DADOS DE BAIXO RISCO (526 ATIVIDADES)  
         const DADOS_BAIXO_RISCO = `1531-9/02|Acabamento de calçados de couro sob contrato
 6613-4/00|Administração de cartões de crédito
 6493-0/00|Administração de consórcios para aquisição de bens e direitos
@@ -1451,7 +1415,7 @@ internacional, exceto travessia
 6499-9/01|Clubes de investimento
 0220-9/03|Coleta de castanha-do-pará em florestas nativas
 0220-9/04|Coleta de látex em florestas nativas
-0220-9/99|Coleta de produtos não-madeireiros não especificados anteriormente em florestas Nativas
+0220-9/99|Coleta de produtos não-madeireiros não especificados anteriormente em florestas nativas
 4541-2/03|Comércio a varejo de motocicletas e motonetas novas
 4541-2/04|Comércio a varejo de motocicletas e motonetas usadas
 4541-2/06|Comércio a varejo de peças e acessórios novos para motocicletas e motonetas
@@ -1497,9 +1461,9 @@ internacional, exceto travessia
 4542-1/02|Comércio sob consignação de motocicletas e motonetas
 4512-9/02|Comércio sob consignação de veículos automotores
 4785-7/01|Comércio varejista de antigüidades
-4755-5/02|Comercio varejista de artigos de armarinho
+4755-5/02|Comércio varejista de artigos de armarinho
 4763-6/04|Comércio varejista de artigos de caça, pesca e camping
-4755-5/03|Comercio varejista de artigos de cama, mesa e banho
+4755-5/03|Comércio varejista de artigos de cama, mesa e banho
 4754-7/02|Comércio varejista de artigos de colchoaria
 4754-7/03|Comércio varejista de artigos de iluminação
 4783-1/01|Comércio varejista de artigos de joalheria
@@ -1517,7 +1481,7 @@ internacional, exceto travessia
 4772-5/00|Comércio varejista de cosméticos, produtos de perfumaria e de higiene pessoal
 4762-8/00|Comércio varejista de discos, CDs, DVDs e fitas
 4721-1/04|Comércio varejista de doces, balas, bombons e semelhantes
-4763-6/05|Comércio varejista de embarcações e outros veículos recreativos; peças e Acessórios
+4763-6/05|Comércio varejista de embarcações e outros veículos recreativos; peças e acessórios
 4789-0/07|Comércio varejista de equipamentos para escritório
 4744-0/01|Comércio varejista de ferragens e ferramentas
 4761-0/02|Comércio varejista de jornais e revistas
@@ -1530,7 +1494,7 @@ internacional, exceto travessia
 4729-6/02|Comércio varejista de mercadorias em lojas de conveniência
 4754-7/01|Comércio varejista de móveis
 4789-0/03|Comércio varejista de objetos de arte
-4759-8/99|Comércio varejista de outros artigos de uso doméstico não especificados Anteriormente
+4759-8/99|Comércio varejista de outros artigos de uso doméstico não especificados anteriormente
 4785-7/99|Comércio varejista de outros artigos usados
 4744-0/06|Comércio varejista de pedras para revestimento
 4789-0/02|Comércio varejista de plantas e flores naturais
@@ -1540,7 +1504,7 @@ internacional, exceto travessia
 4743-1/00|Comércio varejista de vidros
 4753-9/00|Comércio varejista especializado de eletrodomésticos e equipamentos de áudio e vídeo
 4752-1/00|Comércio varejista especializado de equipamentos de telefonia e comunicação
-4751-2/01|Comércio varejista especializado de equipamentos e suprimentos de Informática
+4751-2/01|Comércio varejista especializado de equipamentos e suprimentos de informática
 4756-3/00|Comércio varejista especializado de instrumentos musicais e acessórios
 4757-1/00|Comércio varejista especializado de peças e acessórios para aparelhos eletroeletrônicos para uso doméstico, exceto informática e comunicação
 6435-2/03|Companhias hipotecárias
@@ -1564,7 +1528,7 @@ internacional, exceto travessia
 6612-6/03|Corretoras de câmbio
 6612-6/04|Corretoras de contratos de mercadorias
 6612-6/01|Corretoras de títulos e valores mobiliários
-6622-3/00|Corretores e agentes de seguros, de planos de previdência complementar e de Saúde
+6622-3/00|Corretores e agentes de seguros, de planos de previdência complementar e de saúde
 0159-8/04|Criação de bicho-da-seda
 7319-0/01|Criação de estandes para feiras e exposições
 0119-9/01|Cultivo de abacaxi
@@ -1629,7 +1593,7 @@ internacional, exceto travessia
 8425-6/00|Defesa Civil
 6201-5/01|Desenvolvimento de programas de computador sob encomenda
 6202-3/00|Desenvolvimento e licenciamento de programas de computador customizáveis
-6203-1/00|Desenvolvimento e licenciamento de programas de computador não_x0002_Customizáveis
+6203-1/00|Desenvolvimento e licenciamento de programas de computador não-customizáveis
 7410-2/02|Design de interiores
 7410-2/03|Design de produto
 5913-8/00|Distribuição cinematográfica, de vídeo e de programas de televisão
@@ -1678,23 +1642,22 @@ internacional, exceto travessia
 1540-8/00|Fabricação de partes para calçados, de qualquer material
 1082-1/00|Fabricação de produtos à base de café
 1091-1/02|Fabricação de produtos de padaria e confeitaria com predominância de produção própria
-1742-7/99|Fabricação de produtos de papel para uso doméstico e higiênico_x0002_sanitário não especificados anteriormente
+1742-7/99|Fabricação de produtos de papel para uso doméstico e higiênico-sanitário não especificados anteriormente
 1741-9/02|Fabricação de produtos de papel, cartolina, papel-cartão e papelão ondulado para uso comercial e de escritório
-1749-4/00|Fabricação de produtos de pastas celulósicas, papel, cartolina, papel_x0002_cartão e papelão ondulado não especificados anteriormente
+1749-4/00|Fabricação de produtos de pastas celulósicas, papel, cartolina, papel-cartão e papelão ondulado não especificados anteriormente
 1354-5/00|Fabricação de tecidos especiais, inclusive artefatos
 1532-7/00|Fabricação de tênis de qualquer material
 1412-6/03|Facção de peças do vestuário, exceto roupas íntimas
 1411-8/02|Facção de roupas íntimas
 1413-4/03|Facção de roupas profissionais
 7420-0/04|Filmagem de festas e eventos
-8599-6/01|Formação de condutores
 7830-2/00|Fornecimento e gestão de recursos humanos para terceiros
 8219-9/01|Fotocópias
 6499-9/03|Fundo garantidor de crédito
 6470-1/03|Fundos de investimento imobiliários
 6470-1/02|Fundos de investimento previdenciários
 6470-1/01|Fundos de investimento, exceto previdenciários e imobiliários
-3511-5/01|Geração de energia elétrica ( Energia Solar)
+3511-5/01|Geração de energia elétrica (Energia Solar)
 7740-3/00|Gestão de ativos intangíveis não financeiros
 9003-5/00|Gestão de espaços para artes cênicas, espetáculos e outras atividades artísticas
 9311-5/00|Gestão de instalações de esportes
@@ -1724,7 +1687,7 @@ internacional, exceto travessia
 4713-0/02|Lojas de variedades, exceto lojas de departamentos ou magazines
 4713-0/05|Lojas francas (Duty Free) de aeroportos, portos e em fronteiras terrestres
 6810-2/03|Loteamento de imóveis próprios
-3312-1/02|Manutenção e reparação de aparelhos e instrumentos de medida, teste e Controle
+3312-1/02|Manutenção e reparação de aparelhos e instrumentos de medida, teste e controle
 3312-1/03|Manutenção e reparação de aparelhos eletromédicos e eletroterapêuticos e equipamentos de irradiação
 3312-1/04|Manutenção e reparação de equipamentos e instrumentos ópticos
 3314-7/09|Manutenção e reparação de máquinas de escrever, calcular e de outros equipamentos não-eletrônicos para escritório
@@ -1755,7 +1718,7 @@ internacional, exceto travessia
 4330-4/99|Outras obras de acabamento da construção
 6463-8/00|Outras sociedades de participação, exceto holdings
 4618-4/99|Outros representantes comerciais e agentes do comércio especializado em produtos não especificados anteriormente
-1340-5/99|Outros serviços de acabamento em fios, tecidos, artefatos têxteis e peças do Vestuário
+1340-5/99|Outros serviços de acabamento em fios, tecidos, artefatos têxteis e peças do vestuário
 4929-9/99|Outros transportes rodoviários de passageiros não especificados anteriormente
 9321-2/00|Parques de diversão e parques temáticos
 6621-5/01|Peritos e avaliadores de seguros
@@ -1796,17 +1759,17 @@ internacional, exceto travessia
 9529-1/03|Reparação de relógios
 9511-8/00|Reparação e manutenção de computadores e de equipamentos periféricos
 9512-6/00|Reparação e manutenção de equipamentos de comunicação
-9521-5/00|Reparação e manutenção de equipamentos eletroeletrônicos de uso pessoal e Doméstico
+9521-5/00|Reparação e manutenção de equipamentos eletroeletrônicos de uso pessoal e doméstico
 9529-1/99|Reparação e manutenção de outros objetos e equipamentos pessoais e domésticos não especificados anteriormente
 6619-3/03|Representações de bancos estrangeiros
 4612-5/00|Representantes comerciais e agentes do comércio de combustíveis, minerais, produtos siderúrgicos e químicos
 4615-0/00|Representantes comerciais e agentes do comércio de eletrodomésticos, móveis e artigos de uso doméstico
 4618-4/02|Representantes comerciais e agentes do comércio de instrumentos e materiais odonto-médico-hospitalares
-4618-4/03|Representantes comerciais e agentes do comércio de jornais, revistas e outras Publicações
+4618-4/03|Representantes comerciais e agentes do comércio de jornais, revistas e outras publicações
 4613-3/00|Representantes comerciais e agentes do comércio de madeira, material de construção e ferragens
 4614-1/00|Representantes comerciais e agentes do comércio de máquinas, equipamentos, embarcações e aeronaves
 4611-7/00|Representantes comerciais e agentes do comércio de matérias-primas agrícolas e animais vivos
-4618-4/01|Representantes comerciais e agentes do comércio de medicamentos,cosméticos e produtos de perfumaria
+4618-4/01|Representantes comerciais e agentes do comércio de medicamentos, cosméticos e produtos de perfumaria
 4619-2/00|Representantes comerciais e agentes do comércio de mercadorias em geral não especializado
 4542-1/01|Representantes comerciais e agentes do comércio de motocicletas e motonetas, peças e acessórios
 4530-7/06|Representantes comerciais e agentes do comércio de peças e acessórios novos e usados para veículos automotores
@@ -1883,30 +1846,35 @@ internacional, exceto travessia
 6311-9/00|Tratamento de dados, provedores de serviços de aplicação e serviços de hospedagem na internet
 8599-6/04|Treinamento em desenvolvimento profissional e gerencial
 8599-6/03|Treinamento em informática
-6201-5/02|Web design`.split('\n');
-        
-        // ============================================
-        // FUNÇÃO PARA PROCESSAR OS DADOS
-        // ============================================
-        function parseData(dataArray) {
-            return dataArray
+6201-5/02|Web design`;
+
+        // FUNÇÕES DE PROCESSAMENTO E BUSCA
+        function parseData(dataString) {
+            return dataString
+                .split('\n')
                 .filter(line => line.trim() !== '')
                 .map(line => {
-                    const [cnae, atividade] = line.split('|');
-                    return { 
-                        cnae: cnae.trim(), 
-                        atividade: atividade.trim() 
-                    };
-                });
+                    const parts = line.split('|');
+                    if (parts.length === 2) {
+                        return { 
+                            cnae: parts[0].trim(), 
+                            atividade: parts[1].trim() 
+                        };
+                    }
+                    return null;
+                })
+                .filter(item => item !== null);
         }
 
         const altoRisco = parseData(DADOS_ALTO_RISCO);
         const medioRisco = parseData(DADOS_MEDIO_RISCO);
         const baixoRisco = parseData(DADOS_BAIXO_RISCO);
 
-        // ============================================
-        // FUNÇÕES DE BUSCA E EXIBIÇÃO
-        // ============================================
+        console.log('📊 Dados carregados:');
+        console.log(`🔴 Alto Risco: ${altoRisco.length} atividades`);
+        console.log(`🟡 Médio Risco: ${medioRisco.length} atividades`);
+        console.log(`🟢 Baixo Risco: ${baixoRisco.length} atividades`);
+
         function normalizarTexto(texto) {
             return texto.toLowerCase()
                 .normalize('NFD')
@@ -1929,37 +1897,53 @@ internacional, exceto travessia
             const termoNorm = normalizarTexto(termo);
             const resultados = [];
 
-            // Busca em alto risco
-            altoRisco.forEach(item => {
-                const cnaeMatch = normalizarTexto(item.cnae).includes(termoNorm);
-                const atividadeMatch = normalizarTexto(item.atividade).includes(termoNorm);
-                
-                if (cnaeMatch || atividadeMatch) {
-                    resultados.push({ ...item, risco: 'alto' });
-                }
-            });
-
-            // Busca em médio risco
-            medioRisco.forEach(item => {
-                const cnaeMatch = normalizarTexto(item.cnae).includes(termoNorm);
-                const atividadeMatch = normalizarTexto(item.atividade).includes(termoNorm);
-                
-                if (cnaeMatch || atividadeMatch) {
-                    resultados.push({ ...item, risco: 'medio' });
-                }
-            });
-
-            // Busca em baixo risco
-            baixoRisco.forEach(item => {
-                const cnaeMatch = normalizarTexto(item.cnae).includes(termoNorm);
-                const atividadeMatch = normalizarTexto(item.atividade).includes(termoNorm);
-                
-                if (cnaeMatch || atividadeMatch) {
-                    resultados.push({ ...item, risco: 'baixo' });
-                }
+            [
+                { dados: altoRisco, risco: 'alto' },
+                { dados: medioRisco, risco: 'medio' },
+                { dados: baixoRisco, risco: 'baixo' }
+            ].forEach(({ dados, risco }) => {
+                dados.forEach(item => {
+                    if (normalizarTexto(item.cnae).includes(termoNorm) ||
+                        normalizarTexto(item.atividade).includes(termoNorm)) {
+                        resultados.push({ ...item, risco });
+                    }
+                });
             });
 
             exibirResultados(resultados, termo);
+        }
+
+        function obterInfoRisco(risco) {
+            const infos = {
+                alto: {
+                    titulo: '🔴 ALTO RISCO - Licença Prévia Obrigatória',
+                    significado: 'O que isso significa?',
+                    detalhes: `Para atividades de <strong>ALTO RISCO</strong>, você precisa:<br>
+                    ✓ Obter licença ANTES de iniciar as atividades<br>
+                    ✓ Passar por vistorias técnicas dos órgãos competentes<br>
+                    ✓ Atender requisitos específicos de segurança, meio ambiente e vigilância sanitária<br>
+                    ✓ Aguardar aprovação formal para começar a funcionar`
+                },
+                baixo: {
+                    titulo: '🟢 BAIXO RISCO - Dispensado de Licenciamento',
+                    significado: 'O que isso significa?',
+                    detalhes: `Para atividades de <strong>BAIXO RISCO</strong>:<br>
+                    ✓ Você está DISPENSADO de licenciamento prévio<br>
+                    ✓ Pode iniciar as atividades imediatamente após registro<br>
+                    ✓ Não necessita de vistorias técnicas iniciais<br>
+                    ✓ Processo simplificado de abertura`
+                },
+                medio: {
+                    titulo: '🟡 MÉDIO RISCO - Alvará Provisório',
+                    significado: 'O que isso significa?',
+                    detalhes: `Para atividades de <strong>MÉDIO RISCO</strong>:<br>
+                    ✓ Você recebe um alvará provisório de IMEDIATO<br>
+                    ✓ Pode iniciar as atividades enquanto aguarda vistoria<br>
+                    ✓ Vistorias serão realizadas posteriormente<br>
+                    ✓ Deve atender normas específicas de sua atividade`
+                }
+            };
+            return infos[risco];
         }
 
         function exibirResultados(resultados, termo) {
@@ -1994,58 +1978,7 @@ internacional, exceto travessia
             resultsDiv.innerHTML = html;
         }
 
-        function obterInfoRisco(risco) {
-            if (risco === 'alto') {
-                return {
-                    titulo: '🔴 ALTO RISCO - Licença Prévia Obrigatória',
-                    significado: 'O que isso significa?',
-                    detalhes: `Para atividades de <strong>ALTO RISCO</strong>, você precisa:<br>
-                    ✓ Obter licença ANTES de iniciar as atividades<br>
-                    ✓ Passar por vistorias técnicas dos órgãos competentes<br>
-                    ✓ Atender requisitos específicos de segurança, meio ambiente e vigilância sanitária<br>
-                    ✓ Aguardar aprovação formal para começar a funcionar`
-                };
-            } else if (risco === 'baixo') {
-                return {
-                    titulo: '🟢 BAIXO RISCO - Dispensado de Licenciamento',
-                    significado: 'O que isso significa?',
-                    detalhes: `Para atividades de <strong>BAIXO RISCO</strong>:<br>
-                    ✓ Você está DISPENSADO de licenciamento prévio<br>
-                    ✓ Pode iniciar as atividades imediatamente após registro<br>
-                    ✓ Não necessita de vistorias técnicas iniciais<br>
-                    ✓ Processo simplificado de abertura`
-                };
-            } else {
-                return {
-                    titulo: '🟡 MÉDIO RISCO - Alvará Provisório',
-                    significado: 'O que isso significa?',
-                    detalhes: `Para atividades de <strong>MÉDIO RISCO</strong>:<br>
-                    ✓ Você recebe um alvará provisório de IMEDIATO<br>
-                    ✓ Pode iniciar as atividades enquanto aguarda vistoria<br>
-                    ✓ Vistorias serão realizadas posteriormente<br>
-                    ✓ Deve atender normas específicas de sua atividade`
-                };
-            }
-        }
-
-        // Event listener para busca em tempo real
-        const searchInput = document.getElementById('searchInput');
-        let timeoutId;
-
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                buscar(e.target.value);
-            }, 300);
-        });
-
-        // Focus no input ao carregar
-        searchInput.focus();
-
-        // ============================================
-        // MODAL - INFORMAÇÕES DETALHADAS POR RISCO
-        // ============================================
-        
+        // MODAL
         const informacoesRisco = {
             baixo: {
                 titulo: '🟢 BAIXO RISCO',
@@ -2065,7 +1998,7 @@ internacional, exceto travessia
                         titulo: '⏱️ Prazos e Custos:',
                         itens: [
                             'Prazo: Imediato após registro',
-                            'Custo: Taxas de registro da JUCER, taxa Bombeiro e TFFR do município,',
+                            'Custo: Taxas de registro da JUCER, taxa Bombeiro e TFFR do município',
                             'Sem necessidade de aguardar aprovações'
                         ]
                     },
@@ -2075,13 +2008,13 @@ internacional, exceto travessia
                             'Consulta prévia de viabilidade aprovada',
                             'Obtenção da inscrição municipal',
                             'Credenciamento para emissão de NFS-e',
-                            'Credenciamento ao Domicílio Trubutário Eletrônico (DTEL)'
+                            'Credenciamento ao Domicílio Tributário Eletrônico (DTEL)'
                         ]
                     },
                     {
                         titulo: '⚖️ Legislação aplicável:',
                         itens: [
-                            'Lei Municipal nº 906/2022, 873/2022, 138/2001, 1.562/2003 ',
+                            'Lei Municipal nº 906/2022, 873/2022, 138/2001, 1.562/2003',
                             'Decreto Municipal nº 19.577/2023, 16.482/2019',
                             'Lei Federal nº 11.598/2007 (Redesim)'
                         ]
@@ -2108,7 +2041,7 @@ internacional, exceto travessia
                             'Alvará provisório: Imediato',
                             'Vistoria: Até 180 dias após início',
                             'Regularização: Até 180 dias, após esse prazo sem ação do município, o alvará vira definitivo',
-                            'Custo: Taxas de registro + de vistoria + de funcionamento + (de localização, se houver estabelecimento fixo) + (ambiental e sanitária, se houver atividade) '
+                            'Custo: Taxas de registro + de vistoria + de funcionamento + (de localização, se houver estabelecimento fixo) + (ambiental e sanitária, se houver atividade)'
                         ]
                     },
                     {
@@ -2186,10 +2119,8 @@ internacional, exceto travessia
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
 
-            // Define título
             modalTitle.innerHTML = `<span>${info.titulo}</span>`;
 
-            // Constrói o conteúdo
             let conteudo = `<div class="modal-badge ${tipo}">${info.badge}</div>`;
             
             info.secoes.forEach(secao => {
@@ -2205,11 +2136,10 @@ internacional, exceto travessia
 
             modalBody.innerHTML = conteudo;
             modal.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Previne scroll do body
+            document.body.style.overflow = 'hidden';
         }
 
         function fecharModal(event) {
-            // Fecha apenas se clicar no overlay (fora do modal) ou no botão fechar
             if (!event || event.target.id === 'modalOverlay' || event.target.classList.contains('modal-close')) {
                 const modal = document.getElementById('modalOverlay');
                 modal.classList.remove('active');
@@ -2217,19 +2147,24 @@ internacional, exceto travessia
             }
         }
 
-        // Fechar modal com tecla ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 fecharModal();
             }
         });
 
-        // Log de verificação (pode remover depois)
-        console.log('📊 Dados carregados:');
-        console.log(`🔴 Alto Risco: ${altoRisco.length} atividades`);
-        console.log(`🟡 Médio Risco: ${medioRisco.length} atividades`);
-        console.log(`🟢 Baixo Risco: ${baixoRisco.length} atividades`);
-        console.log(`📋 Total: ${altoRisco.length + medioRisco.length + baixoRisco.length} atividades`);
+        // Event listener para busca
+        const searchInput = document.getElementById('searchInput');
+        let timeoutId;
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                buscar(e.target.value);
+            }, 300);
+        });
+
+        searchInput.focus();
     </script>
 </body>
 </html>
