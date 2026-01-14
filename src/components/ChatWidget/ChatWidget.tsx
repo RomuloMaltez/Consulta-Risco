@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, Loader2, Bot, User } from 'lucide-react';
+import { MessageCircle, Send, Loader2, Bot, User, X } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -128,6 +128,13 @@ export default function ChatWidget() {
                 <p className="text-xs text-blue-100">Online • Sempre disponível</p>
               </div>
             </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="p-2 rounded-full hover:bg-white/15 transition"
+              aria-label="Fechar assistente"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Mensagens */}
