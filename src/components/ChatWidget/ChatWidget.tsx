@@ -57,23 +57,13 @@ export default function ChatWidget() {
     setIsLoading(true);
 
     try {
-      // Pegar últimas 3 mensagens para contexto (excluindo a mensagem inicial)
-      const recentMessages = messages
-        .filter(m => m.id !== '0') // Remove mensagem de boas-vindas
-        .slice(-3) // Últimas 3 mensagens
-        .map(m => ({
-          role: m.sender === 'user' ? 'user' : 'assistant',
-          content: m.text
-        }));
-
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
-          question,
-          history: recentMessages // Adicionar histórico
+          question
         })
       });
 

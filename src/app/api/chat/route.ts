@@ -62,17 +62,9 @@ function normalizeCNAE(input: string): string | null {
  * Usa o Groq (Llama 3) como cérebro do assistente
  * Ele decide se precisa de dados do banco ou se pode responder diretamente
  */
-async function processWithGroq(question: string, history: any[] = []): Promise<{ needsQuery: boolean; queryId?: QueryId; params?: QueryParams; directResponse?: string }> {
+async function processWithGroq(question: string): Promise<{ needsQuery: boolean; queryId?: QueryId; params?: QueryParams; directResponse?: string }> {
   try {
-    // Adicionar contexto do histórico se existir
-    let contextPrompt = '';
-    if (history && history.length > 0) {
-      contextPrompt = '\n\nCONTEXTO DA CONVERSA ANTERIOR:\n' + 
-        history.map(msg => `${msg.role === 'user' ? 'Usuário' : 'Assistente'}: ${msg.content}`).join('\n') +
-        '\n\nUSE ESTE CONTEXTO para entender melhor a pergunta atual.\n';
-    }
-
-    const prompt = `Você é um assistente virtual especializado e amigável da SEMEC Porto Velho. Seu nome é "Assistente CNAE".${contextPrompt}
+    const prompt = `Você é um assistente virtual especializado e amigável da SEMEC Porto Velho. Seu nome é "Assistente CNAE".
 
 Você ajuda contribuintes com questões sobre CNAE, tributação, classificação de serviços, NBS, IBS e CBS.
 
@@ -100,12 +92,17 @@ Exemplos de perguntas pessoais:
   "needsQuery": true,
   "queryId": "cnae_to_item|cnae_details|item_to_details|item_to_nbs|search_text|search_by_risk",
   "params": {
-    "cnae": "apenas números",
-    "item_lc": "formato numérico",
+    "cnae": "apenas números (ex: 6920601)",
+    "item_lc": "formato X.XX ou XX.XX SEM zero à esquerda (ex: 1.01, 17.12)",
     "q": "termo de busca",
     "grau_risco": "ALTO|MEDIO|BAIXO"
   }
 }
+
+EXEMPLOS DE EXTRAÇÃO:
+- "NBS do código 01.01" → {"needsQuery": true, "queryId": "item_to_nbs", "params": {"item_lc": "1.01"}}
+- "CNAE 6920601" → {"needsQuery": true, "queryId": "cnae_to_item", "params": {"cnae": "6920601"}}
+- "item 17.12" → {"needsQuery": true, "queryId": "item_to_details", "params": {"item_lc": "17.12"}}
 
 Tipos de consulta disponíveis:
 
@@ -127,9 +124,17 @@ Tipos de consulta disponíveis:
    - Mantenha APENAS: a palavra-chave da atividade (hospital, consultoria, design, etc)
    - Use UMA palavra sempre que possível
    
-3. **item_to_nbs**: quando pergunta sobre NBS/IBS/CBS de um item específico
-   Exemplos: "qual o NBS do item 17.01?", "códigos NBS do item 5.09", "NBS do 17.12"
-   Ação: extrair o número do item (ex: "17.01")
+3. **item_to_nbs**: quando pergunta sobre NBS/IBS/CBS de um item/código específico
+   Exemplos: 
+   - "qual o NBS do item 17.01?"
+   - "códigos NBS do item 5.09"
+   - "NBS do 17.12"
+   - "quais os NBS para o código 01.01"
+   - "NBS do código 1.05"
+   Ação: 
+   - Extrair o número do item no formato XX.XX
+   - Remover zeros à esquerda: "01.01" → "1.01", "05.09" → "5.09"
+   - Retornar no campo "item_lc" (não "item"!)
    
 4. **search_by_risk**: buscar CNAEs por grau de risco
    Exemplos: "atividades de risco alto", "CNAEs de baixo risco", "mostre riscos médios"
@@ -229,9 +234,10 @@ Se foi "search_text" (busca por palavra-chave):
   - Se encontrou resultados, celebre o sucesso!
   
 Se foi "item_to_nbs" (consulta de código NBS):
-  - DESTAQUE o código NBS encontrado com formatação especial
+  - Liste TODOS os códigos NBS encontrados de forma clara e numerada
+  - IMPORTANTE: Um item LC pode ter MÚLTIPLOS códigos NBS - mostre TODOS
   - Explique o que é NBS/IBS/CBS de forma didática
-  - Mostre todas as informações técnicas disponíveis
+  - Para cada código NBS, mostre suas informações técnicas completas
   
 Se foi "cnae_to_item" (consulta de CNAE específico):
   - Mostre CNAE, descrição, item LC e grau de risco
@@ -429,40 +435,38 @@ function formatResponse(queryId: QueryId, result: any, question: string): string
 
     case 'item_to_nbs':
       if (Array.isArray(result.data) && result.data.length > 0) {
-        const item = result.data[0];
-        response = `📊 **Dados Completos de NBS/IBS/CBS**\n\n`;
-        response += `📌 **Item LC:** ${item.item_lc}\n\n`;
+        const itemLc = result.data[0].item_lc;
+        response = `📊 **Códigos NBS/IBS/CBS para o Item ${itemLc}**\n\n`;
+        response += `Encontrei **${result.data.length}** código(s) NBS relacionado(s):\n\n`;
         
-        if (item.nbs) {
-          response += `🔹 **NBS (Nomenclatura Brasileira de Serviços):**\n`;
-          response += `   Código: ${item.nbs}\n`;
+        result.data.forEach((item: any, index: number) => {
+          response += `**${index + 1}. NBS ${item.nbs}**\n`;
           response += `   ${item.nbs_descricao}\n\n`;
-        }
+          
+          if (item.indop) {
+            response += `   📋 INDOP: ${item.indop}\n`;
+          }
+          
+          if (item.local_incidencia_ibs) {
+            response += `   📍 Local de Incidência: ${item.local_incidencia_ibs}\n`;
+          }
+          
+          if (item.c_class_trib && item.c_class_trib_nome) {
+            response += `   🏛️ Classificação Tributária: ${item.c_class_trib} - ${item.c_class_trib_nome}\n`;
+          }
+          
+          if (item.ps_onerosa) {
+            response += `   💰 Prestação Onerosa: ${item.ps_onerosa === 'S' ? 'Sim' : 'Não'}\n`;
+          }
+          
+          if (item.adq_exterior) {
+            response += `   🌐 Aquisição Exterior: ${item.adq_exterior === 'S' ? 'Sim' : 'Não'}\n`;
+          }
+          
+          response += '\n';
+        });
         
-        if (item.indop) {
-          response += `📋 **INDOP:** ${item.indop}\n`;
-          response += `   (Indicador de Operação para IBS/CBS)\n\n`;
-        }
-        
-        if (item.local_incidencia_ibs) {
-          response += `📍 **Local de Incidência do IBS:** ${item.local_incidencia_ibs}\n\n`;
-        }
-        
-        if (item.c_class_trib) {
-          response += `🏛️ **Classificação Tributária:**\n`;
-          response += `   Código: ${item.c_class_trib}\n`;
-          response += `   ${item.c_class_trib_nome}\n\n`;
-        }
-        
-        if (item.ps_onerosa) {
-          response += `💰 Prestação Onerosa: ${item.ps_onerosa === 'S' ? 'Sim' : 'Não'}\n`;
-        }
-        
-        if (item.adq_exterior) {
-          response += `🌐 Aquisição Exterior: ${item.adq_exterior === 'S' ? 'Sim' : 'Não'}\n`;
-        }
-        
-        response += `\n💬 Precisa de mais informações sobre este item ou outro?`;
+        response += `💬 Precisa de mais detalhes sobre algum desses códigos ou tem outra dúvida?`;
       }
       break;
   }
@@ -496,9 +500,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Obter pergunta e histórico do body
+    // Obter pergunta do body
     const body = await request.json();
-    const { question, history = [] } = body;
+    const { question } = body;
 
     if (!question || typeof question !== 'string' || question.trim().length === 0) {
       return NextResponse.json(
@@ -525,8 +529,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Processar pergunta com Groq com contexto (ele decide tudo)
-    const groqDecision = await processWithGroq(question, history);
+    // Processar pergunta com Groq (ele decide tudo)
+    const groqDecision = await processWithGroq(question);
     
     // Se o Groq respondeu diretamente (pergunta pessoal/geral)
     if (!groqDecision.needsQuery && groqDecision.directResponse) {
