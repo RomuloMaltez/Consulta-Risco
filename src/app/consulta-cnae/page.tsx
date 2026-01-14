@@ -1007,12 +1007,6 @@ export default function ConsultaCNAEPage() {
                 </div>
               )}
 
-              {!loadingSugestoes && cnaeInput.length > 0 && (
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-pv-blue-700/50">
-                  {cnaeInput.length}/3 min
-                </div>
-              )}
-
               {/* Dropdown de Sugestões */}
               {mostrarSugestoes && sugestoes.length > 0 && (
                 <div className="dropdown-sugestoes absolute top-full left-0 right-0 mt-2 bg-white/90 backdrop-blur-md border border-pv-blue-900/15 rounded-2xl shadow-[0_20px_50px_-20px_rgba(15,23,42,0.35)] z-50 max-h-[440px] overflow-hidden ring-1 ring-pv-blue-900/10">
