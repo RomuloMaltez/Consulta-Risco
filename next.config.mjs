@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "export",
+  // Comentado para permitir rotas de API (necessário para o chatbot)
+  // output: "export",
   images: {
     unoptimized: true,
   },

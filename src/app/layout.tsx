@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import ChatWidget from "@/components/ChatWidget/ChatWidget";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={`${poppins.variable} font-poppins antialiased`} suppressHydrationWarning>
         {children}
+        <ChatWidget />
       </body>
     </html>
   );
