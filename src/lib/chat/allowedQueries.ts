@@ -18,7 +18,7 @@ export interface QueryParams {
 
 export interface QueryResult {
   success: boolean;
-  data?: any[];
+  data?: any[] | any;
   error?: string;
   summary?: string;
 }
