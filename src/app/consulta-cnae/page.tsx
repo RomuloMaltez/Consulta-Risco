@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import Navigation from "@/components/Navigation/Navigation";
@@ -69,6 +69,17 @@ function corrigirEncoding(texto: string): string {
   resultado = resultado.replace(/Ãœ/g, 'Ü');
 
   return resultado;
+}
+
+function formatarCnaeInput(valor: string): string {
+  if (!/^[\d\s\-./]*$/.test(valor)) {
+    return valor;
+  }
+
+  const digits = valor.replace(/\D/g, "").slice(0, 7);
+  if (digits.length <= 4) return digits;
+  if (digits.length === 5) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+  return `${digits.slice(0, 4)}-${digits.slice(4, 5)}/${digits.slice(5)}`;
 }
 
 function highlightTexto(texto: string, termo: string) {
@@ -596,6 +607,7 @@ export default function ConsultaCNAEPage() {
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
   const [loadingSugestoes, setLoadingSugestoes] = useState(false);
   const [sugestaoSelecionada, setSugestaoSelecionada] = useState(-1);
+  const suppressSugestoesRef = useRef(false);
 
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
@@ -618,6 +630,14 @@ export default function ConsultaCNAEPage() {
 
   // Buscar sugestões com debounce
   useEffect(() => {
+    if (suppressSugestoesRef.current) {
+      suppressSugestoesRef.current = false;
+      setSugestoes([]);
+      setMostrarSugestoes(false);
+      setLoadingSugestoes(false);
+      return;
+    }
+
     const timer = setTimeout(async () => {
       const termo = cnaeInput.trim();
 
@@ -635,10 +655,11 @@ export default function ConsultaCNAEPage() {
 
         const apenasNumeros = termo.replace(/\D/g, "");
         if (apenasNumeros.length >= 3 && apenasNumeros === termo.replace(/[-./\s]/g, "")) {
+          const termoFormatado = formatarCnaeInput(apenasNumeros);
           const resultado = await supabase
             .from("cnae_item_lc")
             .select("cnae, cnae_mascara, cnae_descricao, grau_risco")
-            .ilike("cnae_mascara", `${apenasNumeros}%`)
+            .ilike("cnae_mascara", `${termoFormatado}%`)
             .limit(10);
 
           data = resultado.data;
@@ -842,7 +863,9 @@ export default function ConsultaCNAEPage() {
 
   const selecionarSugestao = async (cnae: CNAEItemLC) => {
     const codigoCnae = cnae.cnae.toString();
-    setCnaeInput(codigoCnae);
+    suppressSugestoesRef.current = true;
+    setCnaeInput(formatarCnaeInput(codigoCnae));
+    setSugestoes([]);
     setMostrarSugestoes(false);
     setSugestaoSelecionada(-1);
 
@@ -966,7 +989,7 @@ export default function ConsultaCNAEPage() {
                 id="cnae-input"
                 value={cnaeInput}
                 onChange={(e) => {
-                  setCnaeInput(e.target.value);
+                  setCnaeInput(formatarCnaeInput(e.target.value));
                   setSugestaoSelecionada(-1);
                 }}
                 onKeyDown={handleKeyDown}
@@ -992,30 +1015,36 @@ export default function ConsultaCNAEPage() {
 
               {/* Dropdown de Sugestões */}
               {mostrarSugestoes && sugestoes.length > 0 && (
-                <div className="dropdown-sugestoes absolute top-full left-0 right-0 mt-2 bg-white border-2 border-pv-blue-900/20 rounded-xl shadow-2xl z-50 max-h-[400px] overflow-y-auto">
-                  <div className="p-2">
+                <div className="dropdown-sugestoes absolute top-full left-0 right-0 mt-2 bg-white/90 backdrop-blur-md border border-pv-blue-900/15 rounded-2xl shadow-[0_20px_50px_-20px_rgba(15,23,42,0.35)] z-50 max-h-[440px] overflow-hidden ring-1 ring-pv-blue-900/10">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-pv-blue-900/10 bg-white/70">
+                    <span className="text-xs font-semibold text-pv-blue-900 uppercase tracking-wide">Sugestoes</span>
+                    <span className="text-xs text-pv-blue-700/70">{sugestoes.length} {sugestoes.length === 1 ? "resultado" : "resultados"}</span>
+                  </div>
+                  <div className="overflow-y-auto max-h-[360px] py-2">
                     {sugestoes.map((sugestao, index) => (
                       <button
                         key={sugestao.cnae}
                         onClick={() => selecionarSugestao(sugestao)}
                         onMouseEnter={() => setSugestaoSelecionada(index)}
-                        className={`w-full text-left p-4 rounded-lg transition-all ${
+                        className={`group w-full text-left px-4 py-3 transition-all rounded-xl mx-2 border border-transparent ${
                           sugestaoSelecionada === index
-                            ? "bg-pv-blue-900 text-white shadow-lg scale-[1.02]"
-                            : "hover:bg-pv-blue-50 border-2 border-transparent"
+                            ? "bg-gradient-to-r from-pv-blue-900 to-pv-blue-700 text-white shadow-lg"
+                            : "hover:bg-pv-blue-50/70"
                         }`}
                       >
                         <div className="flex items-start gap-3">
-                          <div className="flex-1 min-w-0">
+                          <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-lg border min-w-[76px] text-center ${
+                            sugestaoSelecionada === index
+                              ? "bg-white/15 text-white border-white/30"
+                              : "bg-pv-yellow-500/20 text-pv-blue-900 border-pv-yellow-500/30"
+                          }`}>
+                            {corrigirEncoding(sugestao.cnae_mascara)}
+                          </span>
+                          <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className={`font-mono text-xs font-semibold px-3 py-1 rounded-lg ${
-                                sugestaoSelecionada === index ? "bg-white/20 text-white" : "bg-pv-yellow-500/20 text-pv-blue-900"
-                              }`}>
-                                {corrigirEncoding(sugestao.cnae_mascara)}
-                              </span>
                               {renderizarGrauRisco(sugestao.grau_risco)}
                             </div>
-                            <p className={`text-sm line-clamp-2 ${sugestaoSelecionada === index ? "text-white/90" : "text-pv-blue-700/80"}`}>
+                            <p className={`text-sm line-clamp-2 ${sugestaoSelecionada === index ? "text-white/90" : "text-pv-blue-900/80"}`}>
                               {highlightTexto(sugestao.cnae_descricao, cnaeInput)}
                             </p>
                           </div>
@@ -1023,13 +1052,9 @@ export default function ConsultaCNAEPage() {
                       </button>
                     ))}
                   </div>
-                  <div className="border-t-2 border-pv-gray-200 px-4 py-3 bg-pv-blue-50 text-xs text-pv-blue-700/70 rounded-b-xl flex items-center justify-center gap-2">
-                    <kbd className="px-2 py-1 bg-white rounded border border-pv-gray-300 font-mono">↑↓</kbd>
-                    <span>navegar</span>
-                    <kbd className="px-2 py-1 bg-white rounded border border-pv-gray-300 font-mono">Enter</kbd>
-                    <span>selecionar</span>
-                    <kbd className="px-2 py-1 bg-white rounded border border-pv-gray-300 font-mono">Esc</kbd>
-                    <span>fechar</span>
+                  <div className="border-t border-pv-blue-900/10 px-4 py-2 text-xs text-pv-blue-700/60 flex items-center justify-between bg-white/70">
+                    <span>Up/Down navegar - Enter selecionar</span>
+                    <span>Esc fechar</span>
                   </div>
                 </div>
               )}
