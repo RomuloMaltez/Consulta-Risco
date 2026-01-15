@@ -6,7 +6,7 @@ import { executeQuery, QueryId, QueryParams } from '@/lib/chat/allowedQueries';
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 if (!GROQ_API_KEY) {
-  console.error('ERRO CRÍTICO: GROQ_API_KEY não está configurada nas variáveis de ambiente');
+  console.error('[Config Error] GROQ_API_KEY not configured in environment variables');
 }
 
 // Configuração do Groq (inicialização lazy para evitar erro no build)
@@ -215,7 +215,12 @@ Retorne APENAS o JSON válido, sem markdown, sem explicações.`;
 
     throw new Error('Resposta inválida do Groq');
   } catch (error: any) {
-    console.error('Erro ao processar com Groq:', error);
+    // Log error internally without exposing details
+    console.error('[Groq Processing Error]', {
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error',
+      // Don't log the full error object to avoid leaking sensitive data
+    });
     return {
       needsQuery: false,
       directResponse: 'Desculpe, tive um problema ao processar sua pergunta. Pode tentar novamente? 😊'
@@ -313,7 +318,12 @@ Formate a resposta agora:`;
 
     return completion.choices[0]?.message?.content || formatResponse(queryId, queryResult, question);
   } catch (error) {
-    console.error('Erro ao formatar com Groq:', error);
+    // Log error internally without exposing details
+    console.error('[Groq Formatting Error]', {
+      timestamp: new Date().toISOString(),
+      queryId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     // Fallback para formatação básica
     return formatResponse(queryId, queryResult, question);
   }
@@ -581,9 +591,19 @@ export async function POST(request: NextRequest) {
       response: 'Desculpe, não consegui processar sua pergunta desta vez. Pode reformular? 😊'
     });
   } catch (error: any) {
-    console.error('Erro no endpoint /api/chat:', error);
+    // Log error internally with structured logging
+    console.error('[API Chat Error]', {
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined,
+    });
+    
+    // Return generic error message without exposing internal details
     return NextResponse.json(
-      { error: 'Erro interno do servidor', details: error.message },
+      { 
+        error: 'Erro interno do servidor. Por favor, tente novamente mais tarde.',
+        code: 'INTERNAL_ERROR'
+      },
       { status: 500 }
     );
   }
