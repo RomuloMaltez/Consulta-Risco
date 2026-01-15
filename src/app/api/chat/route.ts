@@ -2,10 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 import { executeQuery, QueryId, QueryParams } from '@/lib/chat/allowedQueries';
 
-// Configuração do Groq
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY || ''
-});
+// Validação da API Key do Groq
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
+if (!GROQ_API_KEY) {
+  console.error('ERRO CRÍTICO: GROQ_API_KEY não está configurada nas variáveis de ambiente');
+}
+
+// Configuração do Groq (inicialização lazy para evitar erro no build)
+const getGroqClient = () => {
+  if (!GROQ_API_KEY) {
+    throw new Error('GROQ_API_KEY não configurada');
+  }
+  return new Groq({ apiKey: GROQ_API_KEY });
+};
 
 // Cache simples em memória (para demonstração)
 const cache = new Map<string, { response: any; timestamp: number }>();
@@ -167,7 +177,8 @@ Pergunta do usuário: "${question}"
 
 Retorne APENAS o JSON válido, sem markdown, sem explicações.`;
 
-    const completion = await groq.chat.completions.create({
+    const groqClient = getGroqClient();
+    const completion = await groqClient.chat.completions.create({
       model: 'llama-3.1-8b-instant',
       messages: [
         {
@@ -283,7 +294,8 @@ IMPORTANTE: Escreva SEM asteriscos duplos (**), use texto normal!
 
 Formate a resposta agora:`;
 
-    const completion = await groq.chat.completions.create({
+    const groqClient = getGroqClient();
+    const completion = await groqClient.chat.completions.create({
       model: 'llama-3.1-8b-instant',
       messages: [
         {
