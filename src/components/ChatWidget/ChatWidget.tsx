@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, Loader2, Bot, User, X } from 'lucide-react';
+import { MessageCircle, Send, Loader2, Bot, User, X, Flag, AlertTriangle, XCircle, HelpCircle, CheckCircle2 } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -9,6 +9,7 @@ interface Message {
   sender: 'user' | 'bot';
   timestamp: Date;
   isError?: boolean;
+  userQuestion?: string; // Pergunta original do usuário
 }
 
 export default function ChatWidget() {
@@ -23,6 +24,9 @@ export default function ChatWidget() {
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [messageToReport, setMessageToReport] = useState<Message | null>(null);
+  const [reportSent, setReportSent] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll para a última mensagem
@@ -33,13 +37,14 @@ export default function ChatWidget() {
   }, [messages, isOpen]);
 
   // Adicionar mensagem
-  const addMessage = (text: string, sender: 'user' | 'bot', isError = false) => {
+  const addMessage = (text: string, sender: 'user' | 'bot', isError = false, userQuestion?: string) => {
     const newMessage: Message = {
       id: Date.now().toString(),
       text,
       sender,
       timestamp: new Date(),
-      isError
+      isError,
+      userQuestion
     };
     setMessages(prev => [...prev, newMessage]);
   };
@@ -73,14 +78,15 @@ export default function ChatWidget() {
         throw new Error(data.error || 'Erro ao processar pergunta');
       }
 
-      // Adicionar resposta do bot
-      addMessage(data.response || 'Desculpe, não consegui processar sua pergunta.', 'bot');
+      // Adicionar resposta do bot (com a pergunta original para denúncias)
+      addMessage(data.response || 'Desculpe, não consegui processar sua pergunta.', 'bot', false, question);
     } catch (error: any) {
       console.error('Erro ao enviar mensagem:', error);
       addMessage(
         `Erro: ${error.message || 'Não foi possível conectar ao servidor. Tente novamente.'}`,
         'bot',
-        true
+        true,
+        question
       );
     } finally {
       setIsLoading(false);
@@ -96,6 +102,64 @@ export default function ChatWidget() {
 
   const handleSuggestionClick = (suggestion: string) => {
     setInputText(suggestion);
+  };
+
+  // Abrir modal de denúncia
+  const handleReportClick = (message: Message) => {
+    setMessageToReport(message);
+    setReportModalOpen(true);
+    setReportSent(false);
+  };
+
+  // Enviar denúncia para WhatsApp
+  const sendReportToWhatsApp = (reason: string) => {
+    if (!messageToReport) return;
+
+    const phone = '556999425251'; // Número da SEMEC
+    
+    // Formatar mensagem para WhatsApp
+    const timestamp = messageToReport.timestamp.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const botResponse = messageToReport.text.length > 200 
+      ? messageToReport.text.substring(0, 200) + '...'
+      : messageToReport.text;
+
+    const reportMessage = `🚨 DENÚNCIA - Chat CNAE
+
+📝 Pergunta do usuário:
+"${messageToReport.userQuestion || 'Não disponível'}"
+
+🤖 Resposta do bot:
+"${botResponse}"
+
+⚠️ Motivo da denúncia:
+${reason}
+
+🕒 Data/Hora:
+${timestamp}
+
+---
+Sistema de Consulta de Risco - SEMEC Porto Velho`;
+
+    // Abrir WhatsApp
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(reportMessage)}`;
+    window.open(whatsappUrl, '_blank');
+
+    // Mostrar confirmação
+    setReportSent(true);
+    
+    // Fechar modal após 2 segundos
+    setTimeout(() => {
+      setReportModalOpen(false);
+      setMessageToReport(null);
+      setReportSent(false);
+    }, 2000);
   };
 
   return (
@@ -124,7 +188,12 @@ export default function ChatWidget() {
                 <Bot className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg">Assistente CNAE</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Assistente CNAE</h3>
+                  <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded uppercase">
+                    Beta
+                  </span>
+                </div>
                 <p className="text-xs text-blue-100">Online • Sempre disponível</p>
               </div>
             </div>
@@ -135,6 +204,13 @@ export default function ChatWidget() {
             >
               <X className="w-5 h-5" />
             </button>
+          </div>
+
+          {/* Disclaimer Beta */}
+          <div className="bg-yellow-50 border-b border-yellow-200 px-3 py-2">
+            <p className="text-[10px] text-yellow-800 leading-tight">
+              ⚠️ <span className="font-semibold">Versão Beta:</span> Este assistente usa IA e pode cometer erros. Verifique as informações antes de decisões oficiais.
+            </p>
           </div>
 
           {/* Mensagens */}
@@ -163,16 +239,30 @@ export default function ChatWidget() {
                 <div className={`flex flex-col max-w-[75%] ${
                   message.sender === 'user' ? 'items-end' : 'items-start'
                 }`}>
-                  <div className={`rounded-2xl px-4 py-2 ${
-                    message.sender === 'user'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-tr-sm'
-                      : message.isError
-                      ? 'bg-red-50 text-red-900 border border-red-200 rounded-tl-sm'
-                      : 'bg-white text-gray-800 border border-gray-200 rounded-tl-sm shadow-sm'
-                  }`}>
-                    <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
-                      {message.text}
-                    </p>
+                  <div className="relative group">
+                    <div className={`rounded-2xl px-4 py-2 ${
+                      message.sender === 'user'
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-tr-sm'
+                        : message.isError
+                        ? 'bg-red-50 text-red-900 border border-red-200 rounded-tl-sm'
+                        : 'bg-white text-gray-800 border border-gray-200 rounded-tl-sm shadow-sm'
+                    }`}>
+                      <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
+                        {message.text}
+                      </p>
+                    </div>
+                    
+                    {/* Botão de denúncia (apenas para mensagens do bot, exceto a primeira) */}
+                    {message.sender === 'bot' && message.id !== '0' && (
+                      <button
+                        onClick={() => handleReportClick(message)}
+                        className="absolute -right-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-full p-1.5 shadow-sm border border-gray-200"
+                        aria-label="Denunciar mensagem"
+                        title="Denunciar resposta incorreta"
+                      >
+                        <Flag className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                   <span className="text-xs text-gray-400 mt-1 px-2">
                     {message.timestamp.toLocaleTimeString('pt-BR', { 
@@ -252,6 +342,108 @@ export default function ChatWidget() {
               </p>
             )}
           </form>
+        </div>
+      )}
+
+      {/* Modal de Denúncia */}
+      {reportModalOpen && messageToReport && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-[calc(100vw-2rem)] mx-4 animate-in zoom-in-95 duration-200">
+            {/* Header do Modal */}
+            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 rounded-t-2xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-full">
+                  <Flag className="w-5 h-5" />
+                </div>
+                <h3 className="font-semibold text-lg">Denunciar Resposta</h3>
+              </div>
+              <button
+                onClick={() => setReportModalOpen(false)}
+                className="p-2 rounded-full hover:bg-white/15 transition"
+                aria-label="Fechar modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Conteúdo do Modal */}
+            <div className="p-6">
+              {reportSent ? (
+                // Confirmação de envio
+                <div className="text-center py-8">
+                  <div className="bg-green-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <CheckCircle2 className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Denúncia Enviada!</h4>
+                  <p className="text-sm text-gray-600">
+                    O WhatsApp foi aberto com sua denúncia pré-formatada.
+                    <br />
+                    Basta enviar a mensagem.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Por que você está denunciando esta resposta? Selecione o motivo:
+                  </p>
+
+                  {/* Opções de motivo */}
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => sendReportToWhatsApp('❌ Informação incorreta ou imprecisa')}
+                      className="w-full text-left p-4 border-2 border-gray-200 rounded-xl hover:border-red-500 hover:bg-red-50 transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="bg-red-100 group-hover:bg-red-200 p-2 rounded-lg transition">
+                          <XCircle className="w-5 h-5 text-red-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">Informação incorreta</p>
+                          <p className="text-xs text-gray-500">Os dados fornecidos estão errados</p>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => sendReportToWhatsApp('🚫 Conteúdo ofensivo ou inadequado')}
+                      className="w-full text-left p-4 border-2 border-gray-200 rounded-xl hover:border-red-500 hover:bg-red-50 transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="bg-orange-100 group-hover:bg-orange-200 p-2 rounded-lg transition">
+                          <AlertTriangle className="w-5 h-5 text-orange-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">Conteúdo inadequado</p>
+                          <p className="text-xs text-gray-500">Resposta ofensiva ou inapropriada</p>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => sendReportToWhatsApp('⚠️ Resposta fora do contexto ou não relacionada')}
+                      className="w-full text-left p-4 border-2 border-gray-200 rounded-xl hover:border-red-500 hover:bg-red-50 transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="bg-yellow-100 group-hover:bg-yellow-200 p-2 rounded-lg transition">
+                          <HelpCircle className="w-5 h-5 text-yellow-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">Fora do contexto</p>
+                          <p className="text-xs text-gray-500">Não respondeu à pergunta feita</p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <p className="text-xs text-gray-500 text-center">
+                      Ao denunciar, você será redirecionado ao WhatsApp da SEMEC com uma mensagem pré-formatada.
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </>
