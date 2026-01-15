@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
+import { z } from 'zod';
 import { executeQuery, QueryId, QueryParams } from '@/lib/chat/allowedQueries';
+
+// Validation schema for chat request
+const ChatRequestSchema = z.object({
+  question: z.string()
+    .min(1, 'Pergunta não pode estar vazia')
+    .max(500, 'Pergunta muito longa (máximo 500 caracteres)')
+    .trim()
+}).strict(); // Prevents extra fields (mass assignment protection)
+
+type ChatRequest = z.infer<typeof ChatRequestSchema>;
 
 // Validação da API Key do Groq
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -522,24 +533,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Obter pergunta do body
+    // Parse and validate request body with Zod
     const body = await request.json();
-    const { question } = body;
-
-    if (!question || typeof question !== 'string' || question.trim().length === 0) {
+    
+    const validationResult = ChatRequestSchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map(err => ({
+        field: err.path.join('.'),
+        message: err.message
+      }));
+      
       return NextResponse.json(
-        { error: 'Pergunta inválida' },
+        { 
+          error: 'Dados inválidos',
+          validation_errors: errors
+        },
         { status: 400 }
       );
     }
 
-    // Verificar tamanho da pergunta
-    if (question.length > 500) {
-      return NextResponse.json(
-        { error: 'Pergunta muito longa (máximo 500 caracteres)' },
-        { status: 400 }
-      );
-    }
+    const { question } = validationResult.data;
 
     // Verificar cache
     const cacheKey = normalizeQuestion(question);
