@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 import { z } from 'zod';
 import { executeQuery, QueryId, QueryParams } from '@/lib/chat/allowedQueries';
+import { getGroqApiKey } from '@/lib/env.server';
 
 // Validation schema for chat request
 const ChatRequestSchema = z.object({
@@ -13,19 +14,16 @@ const ChatRequestSchema = z.object({
 
 type ChatRequest = z.infer<typeof ChatRequestSchema>;
 
-// Validação da API Key do Groq
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
-
-if (!GROQ_API_KEY) {
-  console.error('[Config Error] GROQ_API_KEY not configured in environment variables');
-}
-
 // Configuração do Groq (inicialização lazy para evitar erro no build)
+// Now using validated environment variables from env.server.ts
 const getGroqClient = () => {
-  if (!GROQ_API_KEY) {
-    throw new Error('GROQ_API_KEY não configurada');
+  try {
+    const apiKey = getGroqApiKey();
+    return new Groq({ apiKey });
+  } catch (error) {
+    console.error('[Config Error] Failed to initialize Groq client:', error);
+    throw new Error('Configuração do servidor incompleta');
   }
-  return new Groq({ apiKey: GROQ_API_KEY });
 };
 
 // Cache simples em memória (para demonstração)
@@ -512,13 +510,8 @@ function formatResponse(queryId: QueryId, result: any, question: string): string
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verificar chave API
-    if (!process.env.GROQ_API_KEY) {
-      return NextResponse.json(
-        { error: 'Configuração do servidor incompleta (GROQ_API_KEY não configurada)' },
-        { status: 500 }
-      );
-    }
+    // Verify API key is configured (will throw if not)
+    getGroqApiKey();
 
     // Obter IP para rate limiting
     const ip = request.headers.get('x-forwarded-for') || 
