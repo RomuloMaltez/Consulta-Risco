@@ -48,10 +48,25 @@ export default function Home() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, buscar]);
 
-  const destacarTexto = (texto: string, termo: string) => {
+  const destacarTexto = (texto: string, termo: string): React.ReactNode => {
     if (!termo) return texto;
-    const regex = new RegExp(`(${termo})`, "gi");
-    return texto.replace(regex, "<mark>$1</mark>");
+    
+    try {
+      // Escape special regex characters
+      const escapedTerm = termo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedTerm})`, "gi");
+      const parts = texto.split(regex);
+      
+      return parts.map((part, index) => {
+        if (regex.test(part)) {
+          return <mark key={index}>{part}</mark>;
+        }
+        return part;
+      });
+    } catch (error) {
+      // If regex fails, return original text
+      return texto;
+    }
   };
 
   return (
@@ -132,24 +147,18 @@ export default function Home() {
             const infoRisco = obterInfoRisco(item.risco!);
             return (
               <div key={index} className={`result-item ${item.risco}`}>
-                <div
-                  className="font-mono text-lg md:text-xl font-bold text-slate-800 mb-2"
-                  dangerouslySetInnerHTML={{
-                    __html: `CNAE: ${destacarTexto(item.cnae, searchTerm)}`,
-                  }}
-                />
-                <div
-                  className="text-base md:text-lg text-slate-600 mb-4 leading-relaxed"
-                  dangerouslySetInnerHTML={{
-                    __html: destacarTexto(item.atividade, searchTerm),
-                  }}
-                />
+              <div className="font-mono text-lg md:text-xl font-bold text-slate-800 mb-2">
+                CNAE: {destacarTexto(item.cnae, searchTerm)}
+              </div>
+              <div className="text-base md:text-lg text-slate-600 mb-4 leading-relaxed">
+                {destacarTexto(item.atividade, searchTerm)}
+              </div>
                 <span className={`result-badge ${item.risco}`}>{infoRisco.titulo}</span>
                 <div className="mt-4 p-4 bg-slate-50 rounded-lg text-sm md:text-base leading-relaxed">
                   <strong>{infoRisco.significado}</strong>
                   <br />
                   <br />
-                  <span dangerouslySetInnerHTML={{ __html: infoRisco.detalhes }} />
+                  <div className="whitespace-pre-line">{infoRisco.detalhes.replace(/<br>/g, '\n').replace(/<\/?strong>/g, '')}</div>
                 </div>
                 <button
                   onClick={() => window.print()}

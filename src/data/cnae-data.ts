@@ -176,29 +176,29 @@ export function obterInfoRisco(risco: string) {
     alto: {
       titulo: "🔴 ALTO RISCO - Licença Prévia Obrigatória",
       significado: "O que isso significa?",
-      detalhes: `Para atividades de <strong>ALTO RISCO</strong>, você precisa:<br>
-                ✓ Obter licença ANTES de iniciar as atividades<br>
-                ✓ Passar por vistorias técnicas dos órgãos competentes<br>
-                ✓ Atender requisitos específicos de segurança, meio ambiente e vigilância sanitária<br>
-                ✓ Aguardar aprovação formal para começar a funcionar`,
+      detalhes: `Para atividades de ALTO RISCO, você precisa:
+✓ Obter licença ANTES de iniciar as atividades
+✓ Passar por vistorias técnicas dos órgãos competentes
+✓ Atender requisitos específicos de segurança, meio ambiente e vigilância sanitária
+✓ Aguardar aprovação formal para começar a funcionar`,
     },
     baixo: {
       titulo: "🟢 BAIXO RISCO - Dispensado de Licenciamento",
       significado: "O que isso significa?",
-      detalhes: `Para atividades de <strong>BAIXO RISCO</strong>:<br>
-                ✓ Você está DISPENSADO de licenciamento prévio<br>
-                ✓ Pode iniciar as atividades imediatamente após registro<br>
-                ✓ Não necessita de vistorias técnicas iniciais<br>
-                ✓ Processo simplificado de abertura`,
+      detalhes: `Para atividades de BAIXO RISCO:
+✓ Você está DISPENSADO de licenciamento prévio
+✓ Pode iniciar as atividades imediatamente após registro
+✓ Não necessita de vistorias técnicas iniciais
+✓ Processo simplificado de abertura`,
     },
     medio: {
       titulo: "🟡 MÉDIO RISCO - Alvará Provisório",
       significado: "O que isso significa?",
-      detalhes: `Para atividades de <strong>MÉDIO RISCO</strong>:<br>
-                ✓ Você recebe um alvará provisório de IMEDIATO<br>
-                ✓ Pode iniciar as atividades enquanto aguarda vistoria<br>
-                ✓ Vistorias serão realizadas posteriormente<br>
-                ✓ Deve atender normas específicas de sua atividade`,
+      detalhes: `Para atividades de MÉDIO RISCO:
+✓ Você recebe um alvará provisório de IMEDIATO
+✓ Pode iniciar as atividades enquanto aguarda vistoria
+✓ Vistorias serão realizadas posteriormente
+✓ Deve atender normas específicas de sua atividade`,
     },
   };
   return infos[risco];
