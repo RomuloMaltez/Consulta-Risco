@@ -6,7 +6,7 @@ import Footer from "@/components/Footer/Footer";
 import Navigation from "@/components/Navigation/Navigation";
 import { supabase } from "@/lib/supabase";
 import { CNAEItemLC, ItemListaServicos, ItemLCIBSCBS, GrauRisco, RiscoExplicacao } from "@/types/cnae-supabase";
-import { ChevronDown, ShieldCheck, ShieldAlert, ShieldX, HelpCircle, X, Search, Filter, Building2, FileText, MapPin, Coins, Info } from "lucide-react";
+import { ChevronDown, ShieldCheck, ShieldAlert, ShieldX, HelpCircle, X, Search, Filter, Building2, FileText, MapPin, Coins, Info, ExternalLink } from "lucide-react";
 
 interface ContagemRisco {
   baixo: number;
@@ -142,7 +142,7 @@ function obterExplicacaoRisco(grauRisco: GrauRisco): RiscoExplicacao | null {
       classe: "medio",
       itens: [
         { tipo: "check", texto: "Você recebe um alvará provisório de IMEDIATO" },
-        { tipo: "check", texto: "Pode iniciar as atividades enquanto aguarda vistoria" },
+        { tipo: "check", texto: "Pode iniciar atividades no ato do registro" },
         { tipo: "check", texto: "Vistorias serão realizadas posteriormente" },
         { tipo: "x", texto: "Deve atender normas específicas de sua atividade" },
       ],
@@ -154,12 +154,125 @@ function obterExplicacaoRisco(grauRisco: GrauRisco): RiscoExplicacao | null {
         { tipo: "check", texto: "Você está DISPENSADO de licenciamento prévio" },
         { tipo: "check", texto: "Pode iniciar as atividades imediatamente após registro" },
         { tipo: "check", texto: "Não necessita de vistorias técnicas iniciais" },
-        { tipo: "check", texto: "Processo simplificado de abertura" },
+        { tipo: "check", texto: "Certidão de dispensa emitida automaticamente" },
       ],
     },
   };
 
   return explicacoes[grau] || null;
+}
+
+interface ItemComLink {
+  texto: string;
+  link?: string;
+}
+
+interface DetalheLicenciamento {
+  titulo: string;
+  subtitulo: string;
+  significados: string[];
+  prazosCustos: ItemComLink[];
+  documentos: ItemComLink[];
+  legislacao: string[];
+}
+
+const detalhesLicenciamento: Record<string, DetalheLicenciamento> = {
+  BAIXO: {
+    titulo: "Baixo Risco",
+    subtitulo: "Dispensado de Licenciamento",
+    significados: [
+      "Dispensado de licenciamento prévio",
+      "Não exige vistoria inicial",
+      "Registro simplificado na Junta Comercial",
+      "Certidão de Dispensa emitida automaticamente",
+      "Processo de abertura ágil e desburocratizado",
+    ],
+    prazosCustos: [
+      { texto: "Prazo: Imediato após registro na JUCER" },
+      { texto: "Custo: Taxas de registro da JUCER, taxa Bombeiro e TFFR do município", link: "https://tax-calculator-portovelho.replit.app/" },
+      { texto: "Sem necessidade de aguardar aprovações" },
+    ],
+    documentos: [
+      { texto: "Consulta prévia de viabilidade aprovada", link: "https://www.empresafacil.ro.gov.br/" },
+      { texto: "Obtenção da inscrição municipal", link: "https://www.empresafacil.ro.gov.br/" },
+      { texto: "Credenciamento para emissão de NFS-e", link: "https://nfse.portovelho.ro.gov.br/#/login" },
+      { texto: "Credenciamento ao Domicílio Tributário Eletrônico (DTEL)", link: "https://dtel-cartilha.vercel.app/" },
+    ],
+    legislacao: [
+      "Lei Municipal nº 906/2022, 873/2022, 138/2001, 1.562/2003",
+      "Decreto Municipal nº 19.577/2023, 16.482/2019",
+      "Lei Federal nº 11.598/2007 (Redesim)",
+    ],
+  },
+  MEDIO: {
+    titulo: "Médio Risco",
+    subtitulo: "Alvará Provisório",
+    significados: [
+      "Alvará provisório emitido imediatamente",
+      "Pode iniciar atividades no ato do registro",
+      "Vistoria realizada em até 180 dias",
+      "Deve atender normas sanitárias, ambientais e de segurança",
+      "Prazo para regularização completa: 180 dias",
+    ],
+    prazosCustos: [
+      { texto: "Alvará provisório: imediato" },
+      { texto: "Vistoria: até 180 dias após início" },
+      { texto: "Regularização: até 180 dias; após esse prazo sem ação do município, o alvará vira definitivo" },
+      { texto: "Custo: taxas de registro + vistoria + funcionamento + (localização, se houver estabelecimento fixo) + (ambiental e sanitária, se houver atividade)", link: "https://tax-calculator-portovelho.replit.app/" },
+    ],
+    documentos: [
+      { texto: "Consulta prévia de viabilidade aprovada", link: "https://www.empresafacil.ro.gov.br/" },
+      { texto: "Obtenção da inscrição municipal", link: "https://www.empresafacil.ro.gov.br/" },
+      { texto: "Alvará do Corpo de Bombeiros" },
+      { texto: "Alvará sanitário e ambiental (para algumas atividades)" },
+      { texto: "Demais autorizações específicas (para algumas atividades)" },
+    ],
+    legislacao: [
+      "Lei Municipal nº 906/2022, 873/2022, 138/2001, 1.562/2003",
+      "Decreto Municipal nº 19.577/2023, 16.482/2019",
+      "Resoluções específicas por atividade",
+    ],
+  },
+  ALTO: {
+    titulo: "Alto Risco",
+    subtitulo: "Licença Prévia Obrigatória",
+    significados: [
+      "Licença prévia obrigatória antes de iniciar",
+      "Não pode funcionar antes da aprovação",
+      "Vistoria técnica prévia obrigatória",
+      "Laudos técnicos especializados necessários",
+      "Aprovação de múltiplos órgãos competentes, em especial o do Corpo de Bombeiros",
+    ],
+    prazosCustos: [
+      { texto: "Análise: até 90 dias" },
+      { texto: "Vistoria: agendada após protocolo" },
+      { texto: "Aprovação final: após cumprimento de exigências" },
+      { texto: "Custo: taxas + laudos técnicos + adequações", link: "https://tax-calculator-portovelho.replit.app/" },
+    ],
+    documentos: [
+      { texto: "Projeto completo de instalações" },
+      { texto: "Laudo técnico de segurança" },
+      { texto: "Licença ambiental (quando aplicável)" },
+      { texto: "Licença da Vigilância Sanitária (quando aplicável)" },
+      { texto: "Licença do Corpo de Bombeiros (obrigatório)" },
+      { texto: "Memorial descritivo das atividades" },
+      { texto: "ART/RRT dos responsáveis técnicos" },
+    ],
+    legislacao: [
+      "Lei Municipal nº 906/2022, 873/2022, 138/2001, 1.562/2003",
+      "Decreto Municipal nº 19.577/2023, 16.482/2019",
+      "Portarias específicas da Vigilância Sanitária",
+      "Normas técnicas do Corpo de Bombeiros",
+      "Legislação ambiental aplicável",
+    ],
+  },
+};
+
+function obterDetalhesLicenciamento(grauRisco: GrauRisco): DetalheLicenciamento | null {
+  if (!grauRisco) return null;
+
+  const grau = grauRisco.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return detalhesLicenciamento[grau] || null;
 }
 
 // Tooltip Component
@@ -611,6 +724,7 @@ export default function ConsultaCNAEPage() {
 
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
+  const [isLicenciamentoModalOpen, setIsLicenciamentoModalOpen] = useState(false);
   const [filterRisk, setFilterRisk] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"relevancia" | "codigo" | "risco">("relevancia");
 
@@ -965,6 +1079,7 @@ export default function ConsultaCNAEPage() {
   const temItensServico = itensLcUnicos.length > 0;
 
   const explicacaoRisco = primeiro ? obterExplicacaoRisco(primeiro.grau_risco) : null;
+  const detalhesLicenciamentoAtual = primeiro ? obterDetalhesLicenciamento(primeiro.grau_risco) : null;
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-pv-gray-100 to-white">
@@ -1254,6 +1369,16 @@ export default function ConsultaCNAEPage() {
                           </li>
                         ))}
                       </ul>
+                      {detalhesLicenciamentoAtual && (
+                        <button
+                          onClick={() => setIsLicenciamentoModalOpen(true)}
+                          className="mt-4 inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-pv-blue-900 to-pv-blue-700 rounded-xl hover:from-pv-blue-800 hover:to-pv-blue-600 transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                          <FileText size={18} />
+                          Ver detalhes completos de licenciamento
+                          <ChevronDown size={16} className="-rotate-90" />
+                        </button>
+                      )}
                     </div>
 
                     <div className="pt-4 border-t border-pv-gray-200">
@@ -1393,6 +1518,177 @@ export default function ConsultaCNAEPage() {
           </p>
         </div>
       </Modal>
+
+      {/* Licenciamento Modal - Minimalista */}
+      {detalhesLicenciamentoAtual && (
+        <Modal
+          isOpen={isLicenciamentoModalOpen}
+          onClose={() => setIsLicenciamentoModalOpen(false)}
+          title={`Licenciamento - ${detalhesLicenciamentoAtual.titulo}`}
+        >
+          <div className="space-y-8">
+            {/* Header minimalista */}
+            <div className="text-center pb-6 border-b border-pv-gray-200">
+              <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
+                primeiro?.grau_risco?.toUpperCase() === "BAIXO"
+                  ? "bg-emerald-100"
+                  : primeiro?.grau_risco?.toUpperCase() === "MEDIO" || primeiro?.grau_risco?.toUpperCase() === "MÉDIO"
+                  ? "bg-amber-100"
+                  : "bg-red-100"
+              }`}>
+                {primeiro?.grau_risco?.toUpperCase() === "BAIXO" ? (
+                  <ShieldCheck size={32} className="text-emerald-600" />
+                ) : primeiro?.grau_risco?.toUpperCase() === "MEDIO" || primeiro?.grau_risco?.toUpperCase() === "MÉDIO" ? (
+                  <ShieldAlert size={32} className="text-amber-600" />
+                ) : (
+                  <ShieldX size={32} className="text-red-600" />
+                )}
+              </div>
+              <h3 className="text-2xl font-bold text-pv-blue-900 mb-1">{detalhesLicenciamentoAtual.subtitulo}</h3>
+              <p className="text-pv-blue-700/60">{detalhesLicenciamentoAtual.titulo}</p>
+            </div>
+
+            {/* O que isso significa */}
+            <section>
+              <h4 className="text-sm font-semibold text-pv-blue-900/50 uppercase tracking-wider mb-4">
+                O que isso significa
+              </h4>
+              <div className="space-y-3">
+                {detalhesLicenciamentoAtual.significados.map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-4">
+                    <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold ${
+                      primeiro?.grau_risco?.toUpperCase() === "BAIXO"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : primeiro?.grau_risco?.toUpperCase() === "MEDIO" || primeiro?.grau_risco?.toUpperCase() === "MÉDIO"
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-red-100 text-red-700"
+                    }`}>
+                      {idx + 1}
+                    </span>
+                    <span className="text-pv-blue-900/80 pt-0.5">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Divider */}
+            <hr className="border-pv-gray-200" />
+
+            {/* Prazos e Custos */}
+            <section>
+              <h4 className="text-sm font-semibold text-pv-blue-900/50 uppercase tracking-wider mb-4">
+                Prazos e Custos
+              </h4>
+              <div className="space-y-4">
+                {detalhesLicenciamentoAtual.prazosCustos.map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-4">
+                    <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-pv-blue-900/40 mt-2.5"></span>
+                    <div className="flex-1 space-y-2">
+                      <p className="text-pv-blue-900/80">{item.texto}</p>
+                      {item.link && (
+                        <a
+                          href={item.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group relative inline-flex items-center text-sm font-semibold text-pv-blue-900 before:pointer-events-none before:absolute before:left-0 before:top-[1.3em] before:h-[0.1em] before:w-full before:origin-right before:scale-x-0 before:bg-current before:transition-transform before:duration-300 before:ease-[cubic-bezier(0.4,0,0.2,1)] before:content-[''] hover:before:origin-left hover:before:scale-x-100"
+                        >
+                          Acessar
+                          <svg
+                            className="ml-[0.3em] size-[0.7em] translate-y-1 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+                            fill="none"
+                            viewBox="0 0 10 10"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M1.004 9.166 9.337.833m0 0v8.333m0-8.333H1.004"
+                              stroke="currentColor"
+                              strokeWidth="1.25"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Divider */}
+            <hr className="border-pv-gray-200" />
+
+            {/* Documentos necessários */}
+            <section>
+              <h4 className="text-sm font-semibold text-pv-blue-900/50 uppercase tracking-wider mb-4">
+                Documentos ou ações necessários
+              </h4>
+              <div className="space-y-4">
+                {detalhesLicenciamentoAtual.documentos.map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-4 p-4 bg-pv-gray-50 rounded-xl">
+                    <span className="shrink-0 w-8 h-8 rounded-lg bg-pv-blue-900 text-white flex items-center justify-center text-sm font-semibold">
+                      {idx + 1}
+                    </span>
+                    <div className="flex-1 space-y-3">
+                      <p className="text-pv-blue-900/80 font-medium">{item.texto}</p>
+                      {item.link && (
+                        <a
+                          href={item.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group relative inline-flex items-center text-sm font-semibold text-pv-blue-900 before:pointer-events-none before:absolute before:left-0 before:top-[1.3em] before:h-[0.1em] before:w-full before:origin-right before:scale-x-0 before:bg-current before:transition-transform before:duration-300 before:ease-[cubic-bezier(0.4,0,0.2,1)] before:content-[''] hover:before:origin-left hover:before:scale-x-100"
+                        >
+                          Acessar Portal
+                          <svg
+                            className="ml-[0.3em] size-[0.7em] translate-y-1 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+                            fill="none"
+                            viewBox="0 0 10 10"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M1.004 9.166 9.337.833m0 0v8.333m0-8.333H1.004"
+                              stroke="currentColor"
+                              strokeWidth="1.25"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Divider */}
+            <hr className="border-pv-gray-200" />
+
+            {/* Legislação */}
+            <section>
+              <h4 className="text-sm font-semibold text-pv-blue-900/50 uppercase tracking-wider mb-4">
+                Legislação aplicável
+              </h4>
+              <div className="space-y-2">
+                {detalhesLicenciamentoAtual.legislacao.map((item, idx) => (
+                  <p key={idx} className="text-pv-blue-900/70 text-sm pl-4 border-l-2 border-pv-gray-300">
+                    {item}
+                  </p>
+                ))}
+              </div>
+            </section>
+
+            {/* Footer */}
+            <div className="pt-4 border-t border-pv-gray-200">
+              <p className="text-xs text-pv-blue-700/50 text-center">
+                Informações baseadas na legislação vigente do município de Porto Velho - RO
+              </p>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {/* Overlay para Help Panel */}
       {isHelpOpen && (
