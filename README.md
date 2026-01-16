@@ -6,7 +6,7 @@
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green?logo=supabase)](https://supabase.com/)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](LICENSE)
 
-Sistema web de consulta inteligente para classificação de atividades econômicas (CNAE) com assistente virtual baseado em IA, desenvolvido para a **Secretaria Municipal de Fazenda de Porto Velho**.
+Sistema web de consulta inteligente para classificação de atividades econômicas (CNAE) e de serviços municipais e nacionais, com assistente virtual baseado em IA, desenvolvido para a **Secretaria Municipal de Fazenda de Porto Velho**.
 
 ## 🚀 Funcionalidades
 
