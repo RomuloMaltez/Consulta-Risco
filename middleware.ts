@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Next.js requires unsafe-eval
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https:",
@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
   // Prevent MIME type sniffing
   response.headers.set('X-Content-Type-Options', 'nosniff');
 
-  // Enable XSS protection (legacy but still useful)
+  // Enable XSS protection
   response.headers.set('X-XSS-Protection', '1; mode=block');
 
   // Referrer policy
@@ -38,13 +38,11 @@ export function middleware(request: NextRequest) {
     'camera=(), microphone=(), geolocation=(), interest-cohort=()'
   );
 
-  // HSTS - Force HTTPS (only in production)
-  if (process.env.NODE_ENV === 'production') {
-    response.headers.set(
-      'Strict-Transport-Security',
-      'max-age=31536000; includeSubDomains'
-    );
-  }
+  // HSTS - Force HTTPS (sempre ativo para produção)
+  response.headers.set(
+    'Strict-Transport-Security',
+    'max-age=31536000; includeSubDomains'
+  );
 
   return response;
 }
@@ -56,7 +54,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - public folder files
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.svg$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.ico$).*)',
   ],
 };
