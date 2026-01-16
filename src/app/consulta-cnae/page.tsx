@@ -710,6 +710,9 @@ export default function ConsultaCNAEPage() {
   const [filterRisk, setFilterRisk] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"relevancia" | "codigo" | "risco">("relevancia");
 
+  // Ref para scroll automático aos resultados
+  const resultadosRef = useRef<HTMLDivElement>(null);
+
   // Fechar dropdown ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -751,11 +754,18 @@ export default function ConsultaCNAEPage() {
 
         const apenasNumeros = termo.replace(/\D/g, "");
         if (apenasNumeros.length >= 3 && apenasNumeros === termo.replace(/[-./\s]/g, "")) {
-          const termoFormatado = formatarCnaeInput(apenasNumeros);
+          // Busca pelo código CNAE numérico usando range para encontrar CNAEs que começam com os dígitos
+          // Ex: "7235" → busca CNAEs entre 7235000 e 7235999
+          const digitos = apenasNumeros.length;
+          const multiplicador = Math.pow(10, 7 - digitos); // CNAE tem 7 dígitos
+          const minCnae = parseInt(apenasNumeros) * multiplicador;
+          const maxCnae = (parseInt(apenasNumeros) + 1) * multiplicador - 1;
+
           const resultado = await supabase
             .from("cnae_item_lc")
             .select("cnae, cnae_mascara, cnae_descricao, grau_risco")
-            .ilike("cnae_mascara", `${termoFormatado}%`)
+            .gte("cnae", minCnae)
+            .lte("cnae", maxCnae)
             .limit(10);
 
           data = resultado.data;
@@ -899,27 +909,46 @@ export default function ConsultaCNAEPage() {
         return;
       }
 
-      const itensLc = [...new Set(cnaeData.map((item) => item.item_lc))];
+      // Filtra valores null antes de fazer a query
+      const itensLc = [...new Set(cnaeData.map((item) => item.item_lc).filter((item): item is string => item !== null))];
 
-      const { data: itensData, error: itensError } = await supabase
-        .from("itens_lista_servicos")
-        .select("*")
-        .in("item_lc", itensLc);
+      let itensData: ItemListaServicos[] = [];
+      let ibsData: ItemLCIBSCBS[] = [];
 
-      if (itensError) throw itensError;
+      // Só faz as queries se houver itens LC válidos
+      if (itensLc.length > 0) {
+        const { data: itensResult, error: itensError } = await supabase
+          .from("itens_lista_servicos")
+          .select("*")
+          .in("item_lc", itensLc);
 
-      const { data: ibsData, error: ibsError } = await supabase.from("item_lc_ibs_cbs").select("*").in("item_lc", itensLc);
+        if (itensError) throw itensError;
+        itensData = (itensResult || []) as ItemListaServicos[];
 
-      if (ibsError) throw ibsError;
+        const { data: ibsResult, error: ibsError } = await supabase.from("item_lc_ibs_cbs").select("*").in("item_lc", itensLc);
+
+        if (ibsError) throw ibsError;
+        ibsData = (ibsResult || []) as ItemLCIBSCBS[];
+      }
 
       setResultados({
         cnaeData: cnaeData as CNAEItemLC[],
-        itensData: (itensData || []) as ItemListaServicos[],
-        ibsData: (ibsData || []) as ItemLCIBSCBS[],
+        itensData,
+        ibsData,
       });
+
+      // Scroll suave até os resultados após carregar
+      setTimeout(() => {
+        resultadosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     } catch (err) {
-      console.error("Erro:", err);
-      setError(`Erro ao consultar: ${err instanceof Error ? err.message : "Erro desconhecido"}`);
+      console.error("Erro:", JSON.stringify(err, null, 2));
+      const errorMessage = err instanceof Error
+        ? err.message
+        : typeof err === 'object' && err !== null && 'message' in err
+          ? String((err as { message: unknown }).message)
+          : "Erro desconhecido";
+      setError(`Erro ao consultar: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -984,27 +1013,46 @@ export default function ConsultaCNAEPage() {
         return;
       }
 
-      const itensLc = [...new Set(cnaeData.map((item) => item.item_lc))];
+      // Filtra valores null antes de fazer a query
+      const itensLc = [...new Set(cnaeData.map((item) => item.item_lc).filter((item): item is string => item !== null))];
 
-      const { data: itensData, error: itensError } = await supabase
-        .from("itens_lista_servicos")
-        .select("*")
-        .in("item_lc", itensLc);
+      let itensData: ItemListaServicos[] = [];
+      let ibsData: ItemLCIBSCBS[] = [];
 
-      if (itensError) throw itensError;
+      // Só faz as queries se houver itens LC válidos
+      if (itensLc.length > 0) {
+        const { data: itensResult, error: itensError } = await supabase
+          .from("itens_lista_servicos")
+          .select("*")
+          .in("item_lc", itensLc);
 
-      const { data: ibsData, error: ibsError } = await supabase.from("item_lc_ibs_cbs").select("*").in("item_lc", itensLc);
+        if (itensError) throw itensError;
+        itensData = (itensResult || []) as ItemListaServicos[];
 
-      if (ibsError) throw ibsError;
+        const { data: ibsResult, error: ibsError } = await supabase.from("item_lc_ibs_cbs").select("*").in("item_lc", itensLc);
+
+        if (ibsError) throw ibsError;
+        ibsData = (ibsResult || []) as ItemLCIBSCBS[];
+      }
 
       setResultados({
         cnaeData: cnaeData as CNAEItemLC[],
-        itensData: (itensData || []) as ItemListaServicos[],
-        ibsData: (ibsData || []) as ItemLCIBSCBS[],
+        itensData,
+        ibsData,
       });
+
+      // Scroll suave até os resultados após carregar
+      setTimeout(() => {
+        resultadosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     } catch (err) {
-      console.error("Erro:", err);
-      setError(`Erro ao consultar: ${err instanceof Error ? err.message : "Erro desconhecido"}`);
+      console.error("Erro:", JSON.stringify(err, null, 2));
+      const errorMessage = err instanceof Error
+        ? err.message
+        : typeof err === 'object' && err !== null && 'message' in err
+          ? String((err as { message: unknown }).message)
+          : "Erro desconhecido";
+      setError(`Erro ao consultar: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -1284,7 +1332,7 @@ export default function ConsultaCNAEPage() {
 
         {/* Resultados - CNAE Selecionado */}
         {resultados && primeiro && (
-          <div className="space-y-6">
+          <div ref={resultadosRef} className="space-y-6 scroll-mt-4">
             {/* CNAE Header Card */}
             <div className="bg-gradient-to-r from-pv-blue-900 to-pv-blue-700 text-white rounded-2xl shadow-2xl overflow-hidden">
               <div className="px-6 py-6">
