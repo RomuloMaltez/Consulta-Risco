@@ -1338,32 +1338,6 @@ export default function ConsultaCNAEPage() {
 
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-bold text-pv-blue-900 mb-3">Licenciamento e Funcionamento</h4>
-                      <ul className="space-y-2">
-                        {explicacaoRisco.itens.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-3 text-sm text-pv-blue-900/80">
-                            <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm ${
-                              item.tipo === "check" ? "bg-emerald-100 text-emerald-600" : "bg-red-100 text-red-600"
-                            }`}>
-                              {item.tipo === "check" ? "✓" : "✗"}
-                            </span>
-                            <span>{item.texto}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      {detalhesLicenciamentoAtual && (
-                        <button
-                          onClick={() => setIsLicenciamentoModalOpen(true)}
-                          className="mt-4 inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-pv-blue-900 to-pv-blue-700 rounded-xl hover:from-pv-blue-800 hover:to-pv-blue-600 transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                          <FileText size={18} />
-                          Ver detalhes completos de licenciamento
-                          <ChevronDown size={16} className="-rotate-90" />
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="pt-4 border-t border-pv-gray-200">
                       <h4 className="font-bold text-pv-blue-900 mb-2 flex items-center gap-2">
                         <span>💼</span>
                         Seu Negócio
@@ -1383,6 +1357,19 @@ export default function ConsultaCNAEPage() {
                           <li>• <strong>ISS/NFS-e:</strong> Consulte os Itens LC abaixo para saber a tributação aplicável</li>
                           <li>• <strong>IBS/CBS (Reforma Tributária):</strong> Verifique os códigos NBS e INDOP nos detalhes dos itens</li>
                         </ul>
+                      </div>
+                    )}
+
+                    {detalhesLicenciamentoAtual && (
+                      <div className="pt-4 border-t border-pv-gray-200">
+                        <button
+                          onClick={() => setIsLicenciamentoModalOpen(true)}
+                          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-pv-blue-900 to-pv-blue-700 rounded-xl hover:from-pv-blue-800 hover:to-pv-blue-600 transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                          <FileText size={18} />
+                          Ver detalhes completos sobre o grau de risco
+                          <ChevronDown size={16} className="-rotate-90" />
+                        </button>
                       </div>
                     )}
                   </div>
