@@ -141,4 +141,4 @@ Este projeto foi desenvolvido para a **SEMEC (Secretaria Municipal de Fazenda de
 
 **Desenvolvido com ❤️ usando Next.js 16, React 18, Groq AI e Supabase**
 
-Versão 1.00
+Versão 1.1
