@@ -510,8 +510,8 @@ function formatResponse(queryId: QueryId, result: any, question: string): string
             response += `   📍 Local de Incidência: ${item.local_incidencia_ibs}\n`;
           }
           
-          if (item.c_class_trib && item.c_class_trib_nome) {
-            response += `   🏛️ Classificação Tributária: ${item.c_class_trib} - ${item.c_class_trib_nome}\n`;
+          if (item.cclass_trib && item.nome_cclass_trib) {
+            response += `   🏛️ Classificação Tributária: ${item.cclass_trib} - ${item.nome_cclass_trib}\n`;
           }
           
           if (item.ps_onerosa) {

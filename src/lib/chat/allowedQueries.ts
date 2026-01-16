@@ -27,7 +27,7 @@ export interface QueryResult {
  * Mapa de consultas permitidas baseado no schema real:
  * - cnae_item_lc (1733 rows): cnae, cnae_mascara, cnae_descricao, item_lc, grau_risco
  * - itens_lista_servicos (200 rows): item_lc, descricao
- * - item_lc_ibs_cbs (1739 rows): item_lc, nbs, nbs_descricao, indop, local_incidencia_ibs, c_class_trib, c_class_trib_nome
+ * - item_lc_ibs_cbs (1739 rows): item_lc, nbs, nbs_descricao, indop, local_incidencia_ibs, cclass_trib, nome_cclass_trib
  */
 export const allowedQueries = {
   /**
@@ -178,8 +178,8 @@ export const allowedQueries = {
           adq_exterior,
           indop,
           local_incidencia_ibs,
-          c_class_trib,
-          c_class_trib_nome
+          cclass_trib,
+          nome_cclass_trib
         `)
         .eq('item_lc', params.item_lc)
         .limit(10);
