@@ -4,7 +4,6 @@ import { Instagram } from "lucide-react";
 import { WhatsappIcon } from "../icons/WhatsappIcon";
 
 export default function Header() {
-
   return (
     <>
       <header className="border-b border-slate-200 bg-white">
