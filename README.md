@@ -135,7 +135,7 @@ Este projeto foi desenvolvido para a **SEMEC (Secretaria Municipal de Fazenda de
 
 - 📖 **Documentação:** [/docs](docs/)
 - 🐛 **Issues:** [GitHub Issues](../../issues)
-- 💬 **Contato:** SEMEC Porto Velho
+- 💬 **Contato:** SEMEC-DEF Porto Velho
 
 ---
 
