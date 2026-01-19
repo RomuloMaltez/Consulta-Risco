@@ -367,7 +367,7 @@ function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
               </div>
               <div>
                 <h4 className="font-semibold text-pv-blue-900">Grau de Risco</h4>
-                <p className="text-pv-blue-900/70">Classificação (Baixo, Médio ou Alto) definida pela Resolução CGSIM nº 51/2019 que determina os requisitos de licenciamento.</p>
+                <p className="text-pv-blue-900/70">Classificação (Baixo, Médio ou Alto) definida pela Decreto 19577/23 que determina os requisitos de licenciamento.</p>
               </div>
               <div>
                 <h4 className="font-semibold text-pv-blue-900">LC 116/2003</h4>
@@ -473,7 +473,7 @@ function StatisticsDashboard({ contagem, onInfoClick }: StatisticsDashboardProps
       <div className="text-center mb-6">
         <div className="flex items-center justify-center gap-2 mb-2">
           <h2 className="text-lg font-bold text-pv-blue-900">Atividades Cadastradas no Município de Porto Velho</h2>
-          <Tooltip content="Classificação baseada na Resolução CGSIM nº 51/2019 que define os critérios de risco para licenciamento de atividades econômicas">
+          <Tooltip content="Classificação baseada na Decreto 19577/23 que define os critérios de risco para licenciamento de atividades econômicas">
             <button
               onClick={onInfoClick}
               className="p-1 hover:bg-pv-gray-100 rounded-full transition"
@@ -483,7 +483,7 @@ function StatisticsDashboard({ contagem, onInfoClick }: StatisticsDashboardProps
             </button>
           </Tooltip>
         </div>
-        <p className="text-sm text-pv-blue-700/60">Resolução CGSIM nº 51/2019</p>
+        <p className="text-sm text-pv-blue-700/60">Decreto 19577/23</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -1357,7 +1357,7 @@ export default function ConsultaCNAEPage() {
                 <div className="flex items-center gap-2 text-sm text-white/80 flex-wrap">
                   {temItensServico && (
                     <>
-                      <span className="bg-white/10 px-3 py-1 rounded-lg">{itensLcUnicos.length} Itens LC</span>
+                      <span className="bg-white/10 px-3 py-1 rounded-lg">{itensLcUnicos.length} Serviços</span>
                       <span>•</span>
                     </>
                   )}
@@ -1415,7 +1415,7 @@ export default function ConsultaCNAEPage() {
                           className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-pv-blue-900 to-pv-blue-700 rounded-xl hover:from-pv-blue-800 hover:to-pv-blue-600 transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                         >
                           <FileText size={18} />
-                          Ver detalhes completos sobre o grau de risco
+                          Ver detalhes para obter alvarás
                           <ChevronDown size={16} className="-rotate-90" />
                         </button>
                       </div>
@@ -1437,7 +1437,7 @@ export default function ConsultaCNAEPage() {
               </div>
               {temItensServico && (
                 <div className="bg-white rounded-xl border-2 border-pv-gray-200 p-4 text-center shadow-md hover:shadow-lg transition">
-                  <label className="block text-xs font-bold text-pv-yellow-500 uppercase tracking-wide mb-2">Itens LC</label>
+                  <label className="block text-xs font-bold text-pv-yellow-500 uppercase tracking-wide mb-2">Serviços</label>
                   <span className="text-2xl font-bold text-pv-blue-900">{itensLcUnicos.length}</span>
                 </div>
               )}
@@ -1500,7 +1500,7 @@ export default function ConsultaCNAEPage() {
       <Modal isOpen={isRiskModalOpen} onClose={() => setIsRiskModalOpen(false)} title="O que significa Grau de Risco?">
         <div className="space-y-4 text-sm text-pv-blue-900/80">
           <p>
-            O <strong>Grau de Risco</strong> é uma classificação definida pela <strong>Resolução CGSIM nº 51/2019</strong> que determina
+            O <strong>Grau de Risco</strong> é uma classificação definida pela <strong>Decreto 19577/23</strong> que determina
             os requisitos de licenciamento para abertura e funcionamento de atividades econômicas.
           </p>
 
