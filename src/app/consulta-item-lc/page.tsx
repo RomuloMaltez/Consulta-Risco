@@ -64,6 +64,14 @@ function corrigirEncoding(texto: string): string {
   return resultado;
 }
 
+// Função para normalizar texto removendo acentos (busca accent-insensitive)
+function normalizarTexto(texto: string): string {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 function formatarItemLcInput(valor: string): string {
   if (!/^[\d\s.,]*$/.test(valor)) {
     return valor;
@@ -451,15 +459,21 @@ export default function ConsultaItemLCPage() {
           data = resultado.data;
           error = resultado.error;
         } else {
-          // Busca por descrição
+          // Busca todos para filtrar no frontend (busca accent-insensitive)
           const resultado = await supabase
             .from("itens_lista_servicos")
-            .select("item_lc, descricao")
-            .ilike("descricao", `%${termo}%`)
-            .limit(10);
+            .select("item_lc, descricao");
 
           data = resultado.data;
           error = resultado.error;
+
+          // Filtra no frontend usando normalização (ignora acentos)
+          if (data) {
+            const termoNormalizado = normalizarTexto(termo);
+            data = data.filter(item =>
+              normalizarTexto(item.descricao || "").includes(termoNormalizado)
+            ).slice(0, 10);
+          }
         }
 
         if (error) throw error;
@@ -531,16 +545,22 @@ export default function ConsultaItemLCPage() {
         itemData = resultado.data;
         itemError = resultado.error;
       } else {
-        // Busca por descrição (pega o primeiro resultado)
+        // Busca todos para filtrar no frontend (busca accent-insensitive)
         const resultado = await supabase
           .from("itens_lista_servicos")
-          .select("*")
-          .ilike("descricao", `%${termo}%`)
-          .limit(1)
-          .single();
+          .select("*");
 
-        itemData = resultado.data;
+        const allData = resultado.data;
         itemError = resultado.error;
+
+        // Filtra no frontend usando normalização (ignora acentos)
+        if (allData) {
+          const termoNormalizado = normalizarTexto(termo);
+          const filtrado = allData.filter(item =>
+            normalizarTexto(item.descricao || "").includes(termoNormalizado)
+          );
+          itemData = filtrado.length > 0 ? filtrado[0] : null;
+        }
       }
 
       if (itemError || !itemData) {

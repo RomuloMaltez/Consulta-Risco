@@ -71,6 +71,14 @@ function corrigirEncoding(texto: string): string {
   return resultado;
 }
 
+// Função para normalizar texto removendo acentos (busca accent-insensitive)
+function normalizarTexto(texto: string): string {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 function formatarCnaeInput(valor: string): string {
   if (!/^[\d\s\-./]*$/.test(valor)) {
     return valor;
@@ -771,19 +779,27 @@ export default function ConsultaCNAEPage() {
           data = resultado.data;
           error = resultado.error;
         } else {
+          // Busca mais resultados para filtrar no frontend (busca accent-insensitive)
           const resultado = await supabase
             .from("cnae_item_lc")
             .select("cnae, cnae_mascara, cnae_descricao, grau_risco")
-            .ilike("cnae_descricao", `%${termo}%`)
-            .limit(10);
+            .limit(1000);
 
           data = resultado.data;
           error = resultado.error;
+
+          // Filtra no frontend usando normalização (ignora acentos)
+          if (data) {
+            const termoNormalizado = normalizarTexto(termo);
+            data = data.filter(item =>
+              normalizarTexto(item.cnae_descricao || "").includes(termoNormalizado)
+            );
+          }
         }
 
         if (error) throw error;
 
-        const cnaesUnicos = Array.from(new Map((data || []).map((item) => [item.cnae, item])).values());
+        const cnaesUnicos = Array.from(new Map((data || []).map((item) => [item.cnae, item])).values()).slice(0, 10);
 
         setSugestoes(cnaesUnicos as CNAEItemLC[]);
         setMostrarSugestoes(cnaesUnicos.length > 0 && cnaeInput.trim().length >= 3);
@@ -892,13 +908,21 @@ export default function ConsultaCNAEPage() {
         cnaeData = resultado.data;
         cnaeError = resultado.error;
       } else {
+        // Busca todos os registros para filtrar no frontend (busca accent-insensitive)
         const resultado = await supabase
           .from("cnae_item_lc")
-          .select("*")
-          .ilike("cnae_descricao", `%${termo}%`);
+          .select("*");
 
         cnaeData = resultado.data;
         cnaeError = resultado.error;
+
+        // Filtra no frontend usando normalização (ignora acentos)
+        if (cnaeData) {
+          const termoNormalizado = normalizarTexto(termo);
+          cnaeData = cnaeData.filter(item =>
+            normalizarTexto(item.cnae_descricao || "").includes(termoNormalizado)
+          );
+        }
       }
 
       if (cnaeError) throw cnaeError;
