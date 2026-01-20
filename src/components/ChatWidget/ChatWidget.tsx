@@ -17,7 +17,7 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '0',
-      text: 'Olá! 👋 Sou o **Assistente Virtual da SEMEC Porto Velho**!\n\nEstou aqui para te ajudar com questões fiscais e tributárias. 😊\n\n**Posso te ajudar com:**\n\n📋 Consulta de CNAEs\n🎯 Grau de risco fiscal  \n📌 Lista de Serviços (LC 116/2003)\n📊 Códigos NBS, IBS e CBS\n🔍 Busca por atividade\n\n**Exemplos simples:**\n• "CNAE 6920601"\n• "NBS do código 01.01"\n• "Item 17.01"\n• "CNAEs de contabilidade"\n\nQual sua dúvida? 💬',
+      text: 'Olá! 👋 Sou o **Assistente Virtual da SEMEC Porto Velho**!\n\nEstou aqui para te ajudar com a consulta de atividades e serviços. 😊\n\n**Posso te ajudar com:**\n\n📋 Consulta de CNAEs\n🎯 Grau de risco fiscal  \n📌 Lista de Serviços (LC 116/2003)\n📊 Códigos NBS, IBS e CBS\n🔍 Busca por atividade\n\n**Exemplos simples:**\n• "CNAE 6920601"\n• "NBS do código 01.01"\n• "Item 17.01"\n• "CNAEs de contabilidade"\n\nQual sua dúvida? 💬',
       sender: 'bot',
       timestamp: new Date()
     }
