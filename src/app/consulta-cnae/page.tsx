@@ -779,27 +779,32 @@ export default function ConsultaCNAEPage() {
           data = resultado.data;
           error = resultado.error;
         } else {
-          // Busca mais resultados para filtrar no frontend (busca accent-insensitive)
+          // Busca por descrição usando RPC com unaccent para ignorar acentos
+          const termoNormalizado = normalizarTexto(termo);
+
           const resultado = await supabase
-            .from("cnae_item_lc")
-            .select("cnae, cnae_mascara, cnae_descricao, grau_risco")
-            .limit(1000);
+            .rpc('search_cnae_unaccent', { search_term: termoNormalizado });
 
           data = resultado.data;
           error = resultado.error;
 
-          // Filtra no frontend usando normalização (ignora acentos)
-          if (data) {
-            const termoNormalizado = normalizarTexto(termo);
-            data = data.filter(item =>
-              normalizarTexto(item.cnae_descricao || "").includes(termoNormalizado)
-            );
+          // Se a função RPC não existir, faz busca simples com ilike como fallback
+          if (error) {
+            console.warn('Função RPC não encontrada, usando busca simples:', error.message);
+            const fallbackResult = await supabase
+              .from("cnae_item_lc")
+              .select("cnae, cnae_mascara, cnae_descricao, grau_risco")
+              .ilike('cnae_descricao', `%${termo}%`)
+              .limit(50);
+
+            data = fallbackResult.data;
+            error = fallbackResult.error;
           }
         }
 
         if (error) throw error;
 
-        const cnaesUnicos = Array.from(new Map((data || []).map((item) => [item.cnae, item])).values()).slice(0, 10);
+        const cnaesUnicos = Array.from(new Map((data || []).map((item: { cnae: number; cnae_mascara: string; cnae_descricao: string; grau_risco: string | null }) => [item.cnae, item])).values());
 
         setSugestoes(cnaesUnicos as CNAEItemLC[]);
         setMostrarSugestoes(cnaesUnicos.length > 0 && cnaeInput.trim().length >= 3);
@@ -908,33 +913,41 @@ export default function ConsultaCNAEPage() {
         cnaeData = resultado.data;
         cnaeError = resultado.error;
       } else {
-        // Busca todos os registros para filtrar no frontend (busca accent-insensitive)
+        // Busca por descrição usando RPC com unaccent para ignorar acentos
+        const termoNormalizado = normalizarTexto(termo);
+
         const resultado = await supabase
-          .from("cnae_item_lc")
-          .select("*");
+          .rpc('search_cnae_unaccent', { search_term: termoNormalizado });
 
         cnaeData = resultado.data;
         cnaeError = resultado.error;
 
-        // Filtra no frontend usando normalização (ignora acentos)
-        if (cnaeData) {
-          const termoNormalizado = normalizarTexto(termo);
-          cnaeData = cnaeData.filter(item =>
-            normalizarTexto(item.cnae_descricao || "").includes(termoNormalizado)
-          );
+        // Se a função RPC não existir, faz busca simples com ilike como fallback
+        if (cnaeError) {
+          console.warn('Função RPC não encontrada, usando busca simples:', cnaeError.message);
+          const fallbackResult = await supabase
+            .from("cnae_item_lc")
+            .select("*")
+            .ilike('cnae_descricao', `%${termo}%`);
+
+          cnaeData = fallbackResult.data;
+          cnaeError = fallbackResult.error;
         }
       }
 
       if (cnaeError) throw cnaeError;
 
-      if (!cnaeData || cnaeData.length === 0) {
+      // Cast para o tipo correto
+      const cnaeDataTyped = cnaeData as CNAEItemLC[];
+
+      if (!cnaeDataTyped || cnaeDataTyped.length === 0) {
         setError(`Nenhum CNAE encontrado para "${termo}". Tente usar outras palavras-chave.`);
         setLoading(false);
         return;
       }
 
       // Filtra valores null antes de fazer a query
-      const itensLc = [...new Set(cnaeData.map((item) => item.item_lc).filter((item): item is string => item !== null))];
+      const itensLc = [...new Set(cnaeDataTyped.map((item) => item.item_lc).filter((item): item is string => item !== null))];
 
       let itensData: ItemListaServicos[] = [];
       let ibsData: ItemLCIBSCBS[] = [];
@@ -956,7 +969,7 @@ export default function ConsultaCNAEPage() {
       }
 
       setResultados({
-        cnaeData: cnaeData as CNAEItemLC[],
+        cnaeData: cnaeDataTyped,
         itensData,
         ibsData,
       });
@@ -1037,8 +1050,10 @@ export default function ConsultaCNAEPage() {
         return;
       }
 
+      const cnaeDataTyped = cnaeData as CNAEItemLC[];
+
       // Filtra valores null antes de fazer a query
-      const itensLc = [...new Set(cnaeData.map((item) => item.item_lc).filter((item): item is string => item !== null))];
+      const itensLc = [...new Set(cnaeDataTyped.map((item) => item.item_lc).filter((item): item is string => item !== null))];
 
       let itensData: ItemListaServicos[] = [];
       let ibsData: ItemLCIBSCBS[] = [];
@@ -1060,7 +1075,7 @@ export default function ConsultaCNAEPage() {
       }
 
       setResultados({
-        cnaeData: cnaeData as CNAEItemLC[],
+        cnaeData: cnaeDataTyped,
         itensData,
         ibsData,
       });

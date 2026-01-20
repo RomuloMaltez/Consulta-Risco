@@ -1,44 +1,26 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import SearchModal from "@/components/SearchModal/SearchModal";
 import Navigation from "@/components/Navigation/Navigation";
-import { parseData, normalizarTexto, obterInfoRisco, CNAEItem } from "@/data/cnae-data";
-import { DADOS_ALTO_RISCO, DADOS_MEDIO_RISCO, DADOS_BAIXO_RISCO } from "@/data/cnae-raw";
+import { obterInfoRisco } from "@/data/cnae-data";
+import { useCnaeSearch, CNAEItemSupabase } from "@/hooks/useCnaeSearch";
+
+// Mapeia grau_risco do banco para o formato usado na UI
+function mapRiscoToUI(grauRisco: string | null): "alto" | "medio" | "baixo" {
+  if (!grauRisco) return "baixo";
+  const risco = grauRisco.toUpperCase();
+  if (risco === "ALTO") return "alto";
+  if (risco === "MÉDIO" || risco === "MEDIO") return "medio";
+  return "baixo";
+}
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState<CNAEItem[]>([]);
   const [modalTipo, setModalTipo] = useState<"baixo" | "medio" | "alto" | null>(null);
-
-  const altoRisco = useMemo(() => parseData(DADOS_ALTO_RISCO).map((item) => ({ ...item, risco: "alto" as const })), []);
-  const medioRisco = useMemo(() => parseData(DADOS_MEDIO_RISCO).map((item) => ({ ...item, risco: "medio" as const })), []);
-  const baixoRisco = useMemo(() => parseData(DADOS_BAIXO_RISCO).map((item) => ({ ...item, risco: "baixo" as const })), []);
-
-  const buscar = useCallback(
-    (termo: string) => {
-      if (!termo || termo.length < 2) {
-        setResults([]);
-        return;
-      }
-
-      const termoNorm = normalizarTexto(termo);
-      const resultados: CNAEItem[] = [];
-
-      [altoRisco, medioRisco, baixoRisco].forEach((dados) => {
-        dados.forEach((item) => {
-          if (normalizarTexto(item.cnae).includes(termoNorm) || normalizarTexto(item.atividade).includes(termoNorm)) {
-            resultados.push(item);
-          }
-        });
-      });
-
-      setResults(resultados);
-    },
-    [altoRisco, medioRisco, baixoRisco]
-  );
+  const { results, counts, loading, countsLoading, buscar } = useCnaeSearch();
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -50,21 +32,19 @@ export default function Home() {
 
   const destacarTexto = (texto: string, termo: string): React.ReactNode => {
     if (!termo) return texto;
-    
+
     try {
-      // Escape special regex characters
       const escapedTerm = termo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regex = new RegExp(`(${escapedTerm})`, "gi");
       const parts = texto.split(regex);
-      
+
       return parts.map((part, index) => {
         if (regex.test(part)) {
           return <mark key={index}>{part}</mark>;
         }
         return part;
       });
-    } catch (error) {
-      // If regex fails, return original text
+    } catch {
       return texto;
     }
   };
@@ -90,19 +70,25 @@ export default function Home() {
             <div className="info-card baixo" onClick={() => setModalTipo("baixo")}>
               <div className="text-5xl mb-2">🟢</div>
               <h3>Baixo Risco</h3>
-              <div className="count">{baixoRisco.length}</div>
+              <div className="count">
+                {countsLoading ? "..." : counts.baixo}
+              </div>
               <small className="text-slate-500">Dispensadas de licenciamento</small>
             </div>
             <div className="info-card medio" onClick={() => setModalTipo("medio")}>
               <div className="text-5xl mb-2">🟡</div>
               <h3>Médio Risco</h3>
-              <div className="count">{medioRisco.length}</div>
+              <div className="count">
+                {countsLoading ? "..." : counts.medio}
+              </div>
               <small className="text-slate-500">Alvará provisório imediato</small>
             </div>
             <div className="info-card alto" onClick={() => setModalTipo("alto")}>
               <div className="text-5xl mb-2">🔴</div>
               <h3>Alto Risco</h3>
-              <div className="count">{altoRisco.length}</div>
+              <div className="count">
+                {countsLoading ? "..." : counts.alto}
+              </div>
               <small className="text-slate-500">Licença prévia obrigatória</small>
             </div>
           </div>
@@ -126,8 +112,15 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Loading */}
+        {loading && (
+          <div className="text-center text-pv-blue-900 text-lg mb-5">
+            🔄 Buscando...
+          </div>
+        )}
+
         {/* Contador de Resultados */}
-        {results.length > 0 && (
+        {!loading && results.length > 0 && (
           <div className="text-center text-pv-blue-900 text-lg mb-5 font-semibold">
             ✨ {results.length} resultado{results.length > 1 ? "s" : ""} encontrado{results.length > 1 ? "s" : ""}
           </div>
@@ -135,7 +128,7 @@ export default function Home() {
 
         {/* Resultados */}
         <div>
-          {searchTerm.length >= 2 && results.length === 0 && (
+          {!loading && searchTerm.length >= 2 && results.length === 0 && (
             <div className="text-center py-16 px-5 bg-white rounded-2xl shadow-lg text-pv-blue-900 text-lg">
               😕 Nenhum resultado encontrado.
               <br />
@@ -143,17 +136,18 @@ export default function Home() {
             </div>
           )}
 
-          {results.map((item, index) => {
-            const infoRisco = obterInfoRisco(item.risco!);
+          {results.map((item: CNAEItemSupabase) => {
+            const riscoUI = mapRiscoToUI(item.grau_risco);
+            const infoRisco = obterInfoRisco(riscoUI);
             return (
-              <div key={index} className={`result-item ${item.risco}`}>
+              <div key={item.id} className={`result-item ${riscoUI}`}>
               <div className="font-mono text-lg md:text-xl font-bold text-slate-800 mb-2">
-                CNAE: {destacarTexto(item.cnae, searchTerm)}
+                CNAE: {destacarTexto(item.cnae_mascara, searchTerm)}
               </div>
               <div className="text-base md:text-lg text-slate-600 mb-4 leading-relaxed">
-                {destacarTexto(item.atividade, searchTerm)}
+                {destacarTexto(item.cnae_descricao, searchTerm)}
               </div>
-                <span className={`result-badge ${item.risco}`}>{infoRisco.titulo}</span>
+                <span className={`result-badge ${riscoUI}`}>{infoRisco.titulo}</span>
                 <div className="mt-4 p-4 bg-slate-50 rounded-lg text-sm md:text-base leading-relaxed">
                   <strong>{infoRisco.significado}</strong>
                   <br />
